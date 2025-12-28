@@ -1,0 +1,1443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DON'T PANIC: The Tetris Edition</title>
+    <style>
+        /* ============================================
+           HITCHHIKER'S GUIDE TO THE GALAXY - TETRIS
+           A game about falling blocks and the meaning of life
+           ============================================ */
+
+        /* CSS Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Color Palette - Deep Space Theme */
+        :root {
+            --space-black: #0a0a0f;
+            --deep-space: #0d1117;
+            --electric-green: #00ff41;
+            --amber: #ffb000;
+            --betelgeuse-pink: #ff6b9d;
+            --hyperspace-purple: #9d4edd;
+            --vogon-red: #ff4757;
+            --babel-orange: #ff9f43;
+            --towel-green: #26de81;
+            --gargle-blue: #45aaf2;
+            --watch-gold: #fed330;
+            --improbability-cyan: #00d2d3;
+            --panel-border: #1a3a1a;
+            --panel-bg: rgba(0, 20, 0, 0.85);
+            --text-dim: #4a6a4a;
+        }
+
+        body {
+            background: var(--space-black);
+            color: var(--electric-green);
+            font-family: 'Courier New', 'Lucida Console', monospace;
+            min-height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Animated Starfield Background */
+        .starfield {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle linear infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        /* CRT Scanline Effect */
+        .crt-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.1) 0px,
+                rgba(0, 0, 0, 0.1) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+        }
+
+        /* Main Container */
+        .game-container {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* Title Section */
+        .title-section {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .main-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            color: var(--amber);
+            text-shadow: 
+                0 0 10px var(--amber),
+                0 0 20px var(--amber),
+                0 0 40px rgba(255, 176, 0, 0.5);
+            animation: titleGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes titleGlow {
+            from { text-shadow: 0 0 10px var(--amber), 0 0 20px var(--amber); }
+            to { text-shadow: 0 0 20px var(--amber), 0 0 40px var(--amber), 0 0 60px var(--amber); }
+        }
+
+        .subtitle {
+            font-size: 1rem;
+            color: var(--electric-green);
+            margin-top: 8px;
+            opacity: 0.8;
+            font-style: italic;
+        }
+
+        /* Game Layout */
+        .game-layout {
+            display: flex;
+            gap: 30px;
+            align-items: flex-start;
+        }
+
+        /* Guide Panel (Left Side - Instructions) */
+        .guide-panel {
+            width: 220px;
+            background: var(--panel-bg);
+            border: 2px solid var(--electric-green);
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 
+                0 0 10px rgba(0, 255, 65, 0.3),
+                inset 0 0 20px rgba(0, 255, 65, 0.05);
+        }
+
+        .guide-header {
+            color: var(--amber);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--panel-border);
+            text-align: center;
+        }
+
+        .guide-entry {
+            margin-bottom: 12px;
+            font-size: 0.75rem;
+            line-height: 1.4;
+        }
+
+        .guide-entry-title {
+            color: var(--betelgeuse-pink);
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .guide-entry-text {
+            color: var(--text-dim);
+        }
+
+        .controls-list {
+            font-size: 0.75rem;
+        }
+
+        .control-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0;
+            border-bottom: 1px dotted var(--panel-border);
+        }
+
+        .control-key {
+            color: var(--amber);
+            font-weight: bold;
+        }
+
+        .control-action {
+            color: var(--electric-green);
+        }
+
+        /* Game Board Container */
+        .game-board-container {
+            position: relative;
+        }
+
+        .game-board {
+            border: 3px solid var(--electric-green);
+            border-radius: 4px;
+            box-shadow: 
+                0 0 20px rgba(0, 255, 65, 0.4),
+                inset 0 0 30px rgba(0, 255, 65, 0.1);
+            background: rgba(0, 10, 0, 0.9);
+        }
+
+        /* Side Panel (Right Side - Stats) */
+        .side-panel {
+            width: 200px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .stat-box {
+            background: var(--panel-bg);
+            border: 2px solid var(--electric-green);
+            border-radius: 8px;
+            padding: 12px;
+            box-shadow: 0 0 10px rgba(0, 255, 65, 0.3);
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-dim);
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--amber);
+            text-shadow: 0 0 10px rgba(255, 176, 0, 0.5);
+        }
+
+        /* Next Piece Preview */
+        .next-piece-box {
+            text-align: center;
+        }
+
+        .next-piece-canvas {
+            border: 1px solid var(--panel-border);
+            background: rgba(0, 10, 0, 0.5);
+            margin-top: 8px;
+        }
+
+        /* Piece Names (HHGG themed) */
+        .piece-name {
+            font-size: 0.65rem;
+            color: var(--betelgeuse-pink);
+            margin-top: 5px;
+            font-style: italic;
+        }
+
+        /* High Score */
+        .high-score-box .stat-value {
+            color: var(--hyperspace-purple);
+        }
+
+        /* Message Display */
+        .message-box {
+            min-height: 60px;
+        }
+
+        .message-text {
+            font-size: 0.75rem;
+            color: var(--electric-green);
+            line-height: 1.4;
+            font-style: italic;
+        }
+
+        /* Sound Toggle */
+        .sound-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+        }
+
+        .sound-toggle:hover {
+            color: var(--amber);
+        }
+
+        .sound-status {
+            font-size: 0.8rem;
+            color: var(--electric-green);
+        }
+
+        /* Game Over Overlay */
+        .game-over-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 500;
+            flex-direction: column;
+        }
+
+        .game-over-overlay.active {
+            display: flex;
+        }
+
+        .dont-panic {
+            font-size: 4rem;
+            font-weight: bold;
+            color: var(--vogon-red);
+            text-shadow: 
+                0 0 20px var(--vogon-red),
+                0 0 40px var(--vogon-red);
+            animation: panicPulse 1s ease-in-out infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes panicPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .game-over-quote {
+            font-size: 1.2rem;
+            color: var(--electric-green);
+            max-width: 500px;
+            text-align: center;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .final-score {
+            font-size: 1.5rem;
+            color: var(--amber);
+            margin-bottom: 20px;
+        }
+
+        .restart-prompt {
+            font-size: 1rem;
+            color: var(--text-dim);
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
+        }
+
+        /* Pause Overlay */
+        .pause-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 400;
+        }
+
+        .pause-overlay.active {
+            display: flex;
+        }
+
+        .pause-text {
+            font-size: 3rem;
+            color: var(--amber);
+            text-shadow: 0 0 20px var(--amber);
+            animation: pauseFloat 2s ease-in-out infinite;
+        }
+
+        @keyframes pauseFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* Line Clear Animation Flash */
+        .line-clear-flash {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--electric-green);
+            opacity: 0;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        .line-clear-flash.active {
+            animation: flashEffect 0.3s ease-out;
+        }
+
+        @keyframes flashEffect {
+            0% { opacity: 0.5; }
+            100% { opacity: 0; }
+        }
+
+        /* Screen Shake */
+        .shake {
+            animation: screenShake 0.3s ease-out;
+        }
+
+        @keyframes screenShake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-5px); }
+            40% { transform: translateX(5px); }
+            60% { transform: translateX(-3px); }
+            80% { transform: translateX(3px); }
+        }
+
+        /* Particle Container */
+        .particle-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            animation: particleFade 0.8s ease-out forwards;
+        }
+
+        @keyframes particleFade {
+            0% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0; transform: scale(0) translateY(-50px); }
+        }
+
+        /* Mobile Touch Controls (Hidden by default on desktop) */
+        .touch-controls {
+            display: none;
+            margin-top: 20px;
+            gap: 10px;
+        }
+
+        .touch-btn {
+            background: var(--panel-bg);
+            border: 2px solid var(--electric-green);
+            color: var(--electric-green);
+            padding: 15px 25px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            border-radius: 8px;
+            touch-action: manipulation;
+        }
+
+        .touch-btn:active {
+            background: var(--electric-green);
+            color: var(--space-black);
+        }
+
+        @media (max-width: 900px) {
+            .game-layout {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .guide-panel {
+                display: none;
+            }
+            
+            .side-panel {
+                flex-direction: row;
+                flex-wrap: wrap;
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .stat-box {
+                flex: 1;
+                min-width: 150px;
+            }
+            
+            .touch-controls {
+                display: flex;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Starfield Background -->
+    <div class="starfield" id="starfield"></div>
+    
+    <!-- CRT Scanline Effect -->
+    <div class="crt-overlay"></div>
+
+    <!-- Main Game Container -->
+    <div class="game-container">
+        <!-- Title -->
+        <div class="title-section">
+            <h1 class="main-title">DON'T PANIC</h1>
+            <p class="subtitle">The Tetris Edition — A game about falling blocks and the meaning of life</p>
+        </div>
+
+        <!-- Game Layout -->
+        <div class="game-layout">
+            <!-- Left Panel - Guide Instructions -->
+            <div class="guide-panel">
+                <div class="guide-header">📖 The Guide</div>
+                
+                <div class="guide-entry">
+                    <div class="guide-entry-title">TETRIS (Earth Origin)</div>
+                    <div class="guide-entry-text">
+                        A primitive but surprisingly addictive ritual involving falling geometric shapes. 
+                        Widely considered to be mostly harmless.
+                    </div>
+                </div>
+
+                <div class="guide-entry">
+                    <div class="guide-entry-title">CONTROLS</div>
+                    <div class="controls-list">
+                        <div class="control-item">
+                            <span class="control-key">← →</span>
+                            <span class="control-action">Move</span>
+                        </div>
+                        <div class="control-item">
+                            <span class="control-key">↑</span>
+                            <span class="control-action">Rotate</span>
+                        </div>
+                        <div class="control-item">
+                            <span class="control-key">↓</span>
+                            <span class="control-action">Soft Drop</span>
+                        </div>
+                        <div class="control-item">
+                            <span class="control-key">SPACE</span>
+                            <span class="control-action">Hard Drop</span>
+                        </div>
+                        <div class="control-item">
+                            <span class="control-key">P</span>
+                            <span class="control-action">Pause</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="guide-entry">
+                    <div class="guide-entry-title">TIP</div>
+                    <div class="guide-entry-text">
+                        Always know where your towel is. It may come in handy.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Game Board -->
+            <div class="game-board-container" id="boardContainer">
+                <canvas id="gameBoard" class="game-board"></canvas>
+                <div class="line-clear-flash" id="lineClearFlash"></div>
+                <div class="particle-container" id="particleContainer"></div>
+            </div>
+
+            <!-- Right Panel - Stats -->
+            <div class="side-panel">
+                <!-- Next Piece Preview -->
+                <div class="stat-box next-piece-box">
+                    <div class="stat-label">Probability Matrix</div>
+                    <canvas id="nextPiece" class="next-piece-canvas"></canvas>
+                    <div class="piece-name" id="pieceName">—</div>
+                </div>
+
+                <!-- Score -->
+                <div class="stat-box">
+                    <div class="stat-label">Improbability Factor</div>
+                    <div class="stat-value" id="score">0</div>
+                </div>
+
+                <!-- Level -->
+                <div class="stat-box">
+                    <div class="stat-label">Dimensional Shift</div>
+                    <div class="stat-value" id="level">1</div>
+                </div>
+
+                <!-- Lines -->
+                <div class="stat-box">
+                    <div class="stat-label">Reality Distortions</div>
+                    <div class="stat-value" id="lines">0</div>
+                </div>
+
+                <!-- High Score -->
+                <div class="stat-box high-score-box">
+                    <div class="stat-label">All-Time Improbability</div>
+                    <div class="stat-value" id="highScore">0</div>
+                </div>
+
+                <!-- Message -->
+                <div class="stat-box message-box">
+                    <div class="stat-label">Transmission</div>
+                    <div class="message-text" id="message">Welcome, hoopy frood!</div>
+                </div>
+
+                <!-- Sound Toggle -->
+                <div class="stat-box sound-toggle" id="soundToggle">
+                    <div class="stat-label">Sub-Etha Audio</div>
+                    <div class="sound-status" id="soundStatus">🔊 ON</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Touch Controls -->
+        <div class="touch-controls">
+            <button class="touch-btn" id="btnLeft">←</button>
+            <button class="touch-btn" id="btnRotate">↻</button>
+            <button class="touch-btn" id="btnRight">→</button>
+            <button class="touch-btn" id="btnDrop">⬇</button>
+        </div>
+    </div>
+
+    <!-- Pause Overlay -->
+    <div class="pause-overlay" id="pauseOverlay">
+        <div class="pause-text">TIME IS AN ILLUSION<br>— PAUSED —</div>
+    </div>
+
+    <!-- Game Over Overlay -->
+    <div class="game-over-overlay" id="gameOverOverlay">
+        <div class="dont-panic">DON'T PANIC</div>
+        <div class="game-over-quote" id="gameOverQuote"></div>
+        <div class="final-score" id="finalScore"></div>
+        <div class="restart-prompt">Press R or SPACE to travel through time and try again</div>
+    </div>
+
+    <script>
+        /* ============================================
+           HITCHHIKER'S GUIDE TO THE GALAXY - TETRIS
+           Game Engine - JavaScript
+           ============================================ */
+
+        // ===================
+        // CONSTANTS & CONFIG
+        // ===================
+        
+        const COLS = 10;
+        const ROWS = 20;
+        const BLOCK_SIZE = 30;
+        const PREVIEW_BLOCK_SIZE = 20;
+
+        // Tetromino definitions with HHGG theming
+        // Each piece has: shape matrices for rotations, color, and HHGG name
+        const TETROMINOES = {
+            I: {
+                shapes: [
+                    [[1, 1, 1, 1]],
+                    [[1], [1], [1], [1]]
+                ],
+                color: '#00d2d3', // Improbability cyan
+                name: 'Infinite Improbability Drive',
+                glow: 'rgba(0, 210, 211, 0.6)'
+            },
+            O: {
+                shapes: [
+                    [[1, 1], [1, 1]]
+                ],
+                color: '#fed330', // Watch gold
+                name: 'Digital Watch',
+                glow: 'rgba(254, 211, 48, 0.6)'
+            },
+            T: {
+                shapes: [
+                    [[0, 1, 0], [1, 1, 1]],
+                    [[1, 0], [1, 1], [1, 0]],
+                    [[1, 1, 1], [0, 1, 0]],
+                    [[0, 1], [1, 1], [0, 1]]
+                ],
+                color: '#9d4edd', // Hyperspace purple
+                name: 'Electronic Thumb',
+                glow: 'rgba(157, 78, 221, 0.6)'
+            },
+            S: {
+                shapes: [
+                    [[0, 1, 1], [1, 1, 0]],
+                    [[1, 0], [1, 1], [0, 1]]
+                ],
+                color: '#ff9f43', // Babel orange
+                name: 'Babel Fish',
+                glow: 'rgba(255, 159, 67, 0.6)'
+            },
+            Z: {
+                shapes: [
+                    [[1, 1, 0], [0, 1, 1]],
+                    [[0, 1], [1, 1], [1, 0]]
+                ],
+                color: '#ff4757', // Vogon red
+                name: 'Vogon Poetry Book',
+                glow: 'rgba(255, 71, 87, 0.6)'
+            },
+            J: {
+                shapes: [
+                    [[1, 0, 0], [1, 1, 1]],
+                    [[1, 1], [1, 0], [1, 0]],
+                    [[1, 1, 1], [0, 0, 1]],
+                    [[0, 1], [0, 1], [1, 1]]
+                ],
+                color: '#45aaf2', // Gargle blue
+                name: 'Pan Galactic Gargle Blaster',
+                glow: 'rgba(69, 170, 242, 0.6)'
+            },
+            L: {
+                shapes: [
+                    [[0, 0, 1], [1, 1, 1]],
+                    [[1, 0], [1, 0], [1, 1]],
+                    [[1, 1, 1], [1, 0, 0]],
+                    [[1, 1], [0, 1], [0, 1]]
+                ],
+                color: '#26de81', // Towel green
+                name: 'Towel',
+                glow: 'rgba(38, 222, 129, 0.6)'
+            }
+        };
+
+        const PIECE_TYPES = Object.keys(TETROMINOES);
+
+        // HHGG Quotes and Easter Eggs
+        const GAME_OVER_QUOTES = [
+            "So long, and thanks for all the blocks!",
+            "Time is an illusion. Lunchtime doubly so. Game over triply so.",
+            "In the beginning the Universe was created. This has made a lot of people very angry and been widely regarded as a bad move.",
+            "The ships hung in the sky in much the same way that your blocks didn't.",
+            "Would it save you a lot of time if I just gave up and went mad now?",
+            "I think you ought to know I'm feeling very depressed.",
+            "Life! Don't talk to me about life... or Tetris.",
+            "The Answer to the Ultimate Question of Life, the Universe, and Everything is 42. Your score is not.",
+            "Here I am, brain the size of a planet, and they ask me to watch you stack blocks.",
+            "You're really not going to like it. Not that anyone ever does."
+        ];
+
+        const MILESTONE_MESSAGES = {
+            firstTetris: "Four lines! Almost as satisfying as a Pan Galactic Gargle Blaster.",
+            score1000: "The Vogons would be impressed. Well, no they wouldn't.",
+            score5000: "You're beginning to think the meaning of Tetris might be 42.",
+            score10000: "Zaphod Beeblebrox himself would be mildly interested.",
+            lines42: "You've discovered the Answer to the Ultimate Question of Life, the Universe, and Tetris!",
+            level5: "The ships hung in the sky in much the same way that bricks don't.",
+            level10: "You have entered the Probability Axis. Things are about to get improbable.",
+            level15: "Maximum Improbability achieved. Your towel is irrelevant now."
+        };
+
+        const RANDOM_MESSAGES = [
+            "Don't forget your towel!",
+            "Mostly harmless.",
+            "Share and Enjoy!",
+            "Belgium!",
+            "The Guide says: Stay hoopy, frood.",
+            "Resistance is useless!",
+            "Forty-two.",
+            "So this is it. We're going to die.",
+            "I seem to be having tremendous difficulty with my lifestyle.",
+            "Ford, you're turning into a penguin. Stop it."
+        ];
+
+        // ===================
+        // GAME STATE
+        // ===================
+        
+        let canvas, ctx, nextCanvas, nextCtx;
+        let grid = [];
+        let currentPiece = null;
+        let nextPiece = null;
+        let score = 0;
+        let level = 1;
+        let lines = 0;
+        let highScore = 0;
+        let gameOver = false;
+        let paused = false;
+        let lastDropTime = 0;
+        let dropInterval = 1000; // ms between drops
+        let animationId = null;
+        let soundEnabled = true;
+        let hasAchievedFirstTetris = false;
+        let milestoneFlags = {};
+        
+        // Audio context for sound effects
+        let audioCtx = null;
+
+        // ===================
+        // INITIALIZATION
+        // ===================
+
+        function init() {
+            // Setup canvases
+            canvas = document.getElementById('gameBoard');
+            ctx = canvas.getContext('2d');
+            canvas.width = COLS * BLOCK_SIZE;
+            canvas.height = ROWS * BLOCK_SIZE;
+
+            nextCanvas = document.getElementById('nextPiece');
+            nextCtx = nextCanvas.getContext('2d');
+            nextCanvas.width = 4 * PREVIEW_BLOCK_SIZE;
+            nextCanvas.height = 4 * PREVIEW_BLOCK_SIZE;
+
+            // Load high score from localStorage
+            const savedHighScore = localStorage.getItem('hhgg-tetris-highscore');
+            if (savedHighScore) {
+                highScore = parseInt(savedHighScore);
+                document.getElementById('highScore').textContent = highScore;
+            }
+
+            // Create starfield
+            createStarfield();
+
+            // Setup event listeners
+            setupEventListeners();
+
+            // Initialize audio context on first user interaction
+            document.addEventListener('click', initAudio, { once: true });
+            document.addEventListener('keydown', initAudio, { once: true });
+
+            // Start game
+            resetGame();
+            gameLoop(0);
+        }
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        function createStarfield() {
+            const starfield = document.getElementById('starfield');
+            const numStars = 100;
+            
+            for (let i = 0; i < numStars; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                const size = Math.random() * 2 + 1;
+                star.style.width = size + 'px';
+                star.style.height = size + 'px';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                star.style.animationDelay = Math.random() * 2 + 's';
+                starfield.appendChild(star);
+            }
+        }
+
+        function setupEventListeners() {
+            document.addEventListener('keydown', handleKeyDown);
+            
+            // Sound toggle
+            document.getElementById('soundToggle').addEventListener('click', toggleSound);
+            
+            // Touch controls
+            document.getElementById('btnLeft').addEventListener('touchstart', (e) => { e.preventDefault(); movePiece(-1, 0); });
+            document.getElementById('btnRight').addEventListener('touchstart', (e) => { e.preventDefault(); movePiece(1, 0); });
+            document.getElementById('btnRotate').addEventListener('touchstart', (e) => { e.preventDefault(); rotatePiece(); });
+            document.getElementById('btnDrop').addEventListener('touchstart', (e) => { e.preventDefault(); hardDrop(); });
+        }
+
+        function handleKeyDown(e) {
+            if (gameOver) {
+                if (e.code === 'KeyR' || e.code === 'Space') {
+                    resetGame();
+                }
+                return;
+            }
+
+            if (e.code === 'KeyP') {
+                togglePause();
+                return;
+            }
+
+            if (paused) return;
+
+            switch (e.code) {
+                case 'ArrowLeft':
+                    movePiece(-1, 0);
+                    e.preventDefault();
+                    break;
+                case 'ArrowRight':
+                    movePiece(1, 0);
+                    e.preventDefault();
+                    break;
+                case 'ArrowDown':
+                    movePiece(0, 1);
+                    score += 1; // Soft drop bonus
+                    updateScoreDisplay();
+                    e.preventDefault();
+                    break;
+                case 'ArrowUp':
+                    rotatePiece();
+                    e.preventDefault();
+                    break;
+                case 'Space':
+                    hardDrop();
+                    e.preventDefault();
+                    break;
+            }
+        }
+
+        function togglePause() {
+            paused = !paused;
+            document.getElementById('pauseOverlay').classList.toggle('active', paused);
+            if (!paused) {
+                lastDropTime = performance.now();
+            }
+        }
+
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            document.getElementById('soundStatus').textContent = soundEnabled ? '🔊 ON' : '🔇 OFF';
+        }
+
+        // ===================
+        // GAME LOGIC
+        // ===================
+
+        function resetGame() {
+            // Clear grid
+            grid = Array(ROWS).fill(null).map(() => Array(COLS).fill(null));
+            
+            // Reset state
+            score = 0;
+            level = 1;
+            lines = 0;
+            gameOver = false;
+            paused = false;
+            hasAchievedFirstTetris = false;
+            milestoneFlags = {};
+            dropInterval = 1000;
+            lastDropTime = performance.now();
+
+            // Hide overlays
+            document.getElementById('gameOverOverlay').classList.remove('active');
+            document.getElementById('pauseOverlay').classList.remove('active');
+
+            // Spawn pieces
+            nextPiece = createPiece();
+            spawnPiece();
+
+            // Update displays
+            updateScoreDisplay();
+            setMessage("Welcome, hoopy frood!");
+        }
+
+        function createPiece() {
+            const type = PIECE_TYPES[Math.floor(Math.random() * PIECE_TYPES.length)];
+            const tetromino = TETROMINOES[type];
+            return {
+                type: type,
+                rotation: 0,
+                shape: tetromino.shapes[0],
+                color: tetromino.color,
+                glow: tetromino.glow,
+                name: tetromino.name,
+                x: Math.floor(COLS / 2) - Math.floor(tetromino.shapes[0][0].length / 2),
+                y: 0
+            };
+        }
+
+        function spawnPiece() {
+            currentPiece = nextPiece;
+            nextPiece = createPiece();
+            
+            // Update next piece display
+            drawNextPiece();
+            document.getElementById('pieceName').textContent = nextPiece.name;
+
+            // Check if spawn position is valid
+            if (!isValidPosition(currentPiece.x, currentPiece.y, currentPiece.shape)) {
+                endGame();
+            }
+        }
+
+        function isValidPosition(x, y, shape) {
+            for (let row = 0; row < shape.length; row++) {
+                for (let col = 0; col < shape[row].length; col++) {
+                    if (shape[row][col]) {
+                        const newX = x + col;
+                        const newY = y + row;
+                        
+                        // Check boundaries
+                        if (newX < 0 || newX >= COLS || newY >= ROWS) {
+                            return false;
+                        }
+                        
+                        // Check collision with placed pieces (ignore if above grid)
+                        if (newY >= 0 && grid[newY][newX]) {
+                            return false;
+                        }
+                    }
+                }
+            }
+            return true;
+        }
+
+        function movePiece(dx, dy) {
+            const newX = currentPiece.x + dx;
+            const newY = currentPiece.y + dy;
+            
+            if (isValidPosition(newX, newY, currentPiece.shape)) {
+                currentPiece.x = newX;
+                currentPiece.y = newY;
+                if (dx !== 0) playSound('move');
+                return true;
+            }
+            return false;
+        }
+
+        function rotatePiece() {
+            const tetromino = TETROMINOES[currentPiece.type];
+            const nextRotation = (currentPiece.rotation + 1) % tetromino.shapes.length;
+            const nextShape = tetromino.shapes[nextRotation];
+            
+            // Try basic rotation
+            if (isValidPosition(currentPiece.x, currentPiece.y, nextShape)) {
+                currentPiece.rotation = nextRotation;
+                currentPiece.shape = nextShape;
+                playSound('rotate');
+                return;
+            }
+            
+            // Wall kick attempts
+            const kicks = [-1, 1, -2, 2];
+            for (const kick of kicks) {
+                if (isValidPosition(currentPiece.x + kick, currentPiece.y, nextShape)) {
+                    currentPiece.x += kick;
+                    currentPiece.rotation = nextRotation;
+                    currentPiece.shape = nextShape;
+                    playSound('rotate');
+                    return;
+                }
+            }
+        }
+
+        function hardDrop() {
+            let dropDistance = 0;
+            while (movePiece(0, 1)) {
+                dropDistance++;
+            }
+            score += dropDistance * 2; // Hard drop bonus
+            updateScoreDisplay();
+            lockPiece();
+            playSound('drop');
+        }
+
+        function lockPiece() {
+            // Place piece on grid
+            for (let row = 0; row < currentPiece.shape.length; row++) {
+                for (let col = 0; col < currentPiece.shape[row].length; col++) {
+                    if (currentPiece.shape[row][col]) {
+                        const gridY = currentPiece.y + row;
+                        const gridX = currentPiece.x + col;
+                        if (gridY >= 0) {
+                            grid[gridY][gridX] = {
+                                color: currentPiece.color,
+                                glow: currentPiece.glow
+                            };
+                        }
+                    }
+                }
+            }
+            
+            // Check for line clears
+            clearLines();
+            
+            // Spawn next piece
+            spawnPiece();
+        }
+
+        function clearLines() {
+            let linesCleared = 0;
+            const linesToClear = [];
+            
+            // Find complete lines
+            for (let row = ROWS - 1; row >= 0; row--) {
+                if (grid[row].every(cell => cell !== null)) {
+                    linesToClear.push(row);
+                    linesCleared++;
+                }
+            }
+            
+            if (linesCleared > 0) {
+                // Visual effects
+                triggerLineClearEffect(linesToClear);
+                createParticles(linesToClear);
+                
+                // Remove lines
+                for (const row of linesToClear) {
+                    grid.splice(row, 1);
+                    grid.unshift(Array(COLS).fill(null));
+                }
+                
+                // Update score
+                const lineScores = [0, 100, 300, 500, 800];
+                const baseScore = lineScores[linesCleared] || 800;
+                score += baseScore * level;
+                lines += linesCleared;
+                
+                // Check for Tetris (4 lines)
+                if (linesCleared === 4 && !hasAchievedFirstTetris) {
+                    hasAchievedFirstTetris = true;
+                    setMessage(MILESTONE_MESSAGES.firstTetris);
+                }
+                
+                // Check for 42 lines Easter egg
+                if (lines >= 42 && !milestoneFlags.lines42) {
+                    milestoneFlags.lines42 = true;
+                    setMessage(MILESTONE_MESSAGES.lines42);
+                }
+                
+                // Level up every 10 lines
+                const newLevel = Math.floor(lines / 10) + 1;
+                if (newLevel > level) {
+                    level = Math.min(newLevel, 15);
+                    dropInterval = Math.max(100, 1000 - (level - 1) * 60);
+                    checkLevelMilestones();
+                }
+                
+                checkScoreMilestones();
+                updateScoreDisplay();
+                playSound('clear');
+            }
+        }
+
+        function checkScoreMilestones() {
+            if (score >= 1000 && !milestoneFlags.score1000) {
+                milestoneFlags.score1000 = true;
+                setMessage(MILESTONE_MESSAGES.score1000);
+            } else if (score >= 5000 && !milestoneFlags.score5000) {
+                milestoneFlags.score5000 = true;
+                setMessage(MILESTONE_MESSAGES.score5000);
+            } else if (score >= 10000 && !milestoneFlags.score10000) {
+                milestoneFlags.score10000 = true;
+                setMessage(MILESTONE_MESSAGES.score10000);
+            }
+            
+            // Special 42 easter egg
+            if (score.toString().includes('42') && !milestoneFlags['score42_' + score]) {
+                milestoneFlags['score42_' + score] = true;
+                // Small bonus for hitting 42
+                score += 42;
+            }
+        }
+
+        function checkLevelMilestones() {
+            if (level === 5 && !milestoneFlags.level5) {
+                milestoneFlags.level5 = true;
+                setMessage(MILESTONE_MESSAGES.level5);
+            } else if (level === 10 && !milestoneFlags.level10) {
+                milestoneFlags.level10 = true;
+                setMessage(MILESTONE_MESSAGES.level10);
+            } else if (level === 15 && !milestoneFlags.level15) {
+                milestoneFlags.level15 = true;
+                setMessage(MILESTONE_MESSAGES.level15);
+            }
+        }
+
+        function triggerLineClearEffect(linesToClear) {
+            const flash = document.getElementById('lineClearFlash');
+            flash.classList.add('active');
+            setTimeout(() => flash.classList.remove('active'), 300);
+            
+            const container = document.getElementById('boardContainer');
+            container.classList.add('shake');
+            setTimeout(() => container.classList.remove('shake'), 300);
+        }
+
+        function createParticles(linesToClear) {
+            const container = document.getElementById('particleContainer');
+            const colors = ['#00ff41', '#ffb000', '#ff6b9d', '#9d4edd', '#00d2d3'];
+            
+            for (const row of linesToClear) {
+                for (let i = 0; i < 10; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+                    particle.style.left = (Math.random() * 100) + '%';
+                    particle.style.top = ((row / ROWS) * 100) + '%';
+                    particle.style.width = (Math.random() * 8 + 4) + 'px';
+                    particle.style.height = particle.style.width;
+                    particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    container.appendChild(particle);
+                    
+                    setTimeout(() => particle.remove(), 800);
+                }
+            }
+        }
+
+        function endGame() {
+            gameOver = true;
+            
+            // Update high score
+            if (score > highScore) {
+                highScore = score;
+                localStorage.setItem('hhgg-tetris-highscore', highScore.toString());
+                document.getElementById('highScore').textContent = highScore;
+            }
+            
+            // Show game over overlay
+            const quote = GAME_OVER_QUOTES[Math.floor(Math.random() * GAME_OVER_QUOTES.length)];
+            document.getElementById('gameOverQuote').textContent = '"' + quote + '"';
+            document.getElementById('finalScore').textContent = 
+                `Improbability Factor: ${score} | Dimensional Shift: ${level} | Reality Distortions: ${lines}`;
+            document.getElementById('gameOverOverlay').classList.add('active');
+            
+            playSound('gameOver');
+        }
+
+        // ===================
+        // RENDERING
+        // ===================
+
+        function gameLoop(timestamp) {
+            if (!gameOver && !paused) {
+                // Update piece position based on time
+                if (timestamp - lastDropTime > dropInterval) {
+                    if (!movePiece(0, 1)) {
+                        lockPiece();
+                    }
+                    lastDropTime = timestamp;
+                }
+            }
+            
+            render();
+            animationId = requestAnimationFrame(gameLoop);
+        }
+
+        function render() {
+            // Clear canvas
+            ctx.fillStyle = 'rgba(5, 10, 5, 0.95)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw grid lines (subtle)
+            ctx.strokeStyle = 'rgba(0, 255, 65, 0.1)';
+            ctx.lineWidth = 1;
+            for (let x = 0; x <= COLS; x++) {
+                ctx.beginPath();
+                ctx.moveTo(x * BLOCK_SIZE, 0);
+                ctx.lineTo(x * BLOCK_SIZE, canvas.height);
+                ctx.stroke();
+            }
+            for (let y = 0; y <= ROWS; y++) {
+                ctx.beginPath();
+                ctx.moveTo(0, y * BLOCK_SIZE);
+                ctx.lineTo(canvas.width, y * BLOCK_SIZE);
+                ctx.stroke();
+            }
+            
+            // Draw placed pieces
+            for (let row = 0; row < ROWS; row++) {
+                for (let col = 0; col < COLS; col++) {
+                    if (grid[row][col]) {
+                        drawBlock(ctx, col, row, grid[row][col].color, grid[row][col].glow, BLOCK_SIZE);
+                    }
+                }
+            }
+            
+            // Draw ghost piece (preview of where piece will land)
+            if (currentPiece && !gameOver) {
+                drawGhostPiece();
+                
+                // Draw current piece
+                for (let row = 0; row < currentPiece.shape.length; row++) {
+                    for (let col = 0; col < currentPiece.shape[row].length; col++) {
+                        if (currentPiece.shape[row][col]) {
+                            drawBlock(
+                                ctx,
+                                currentPiece.x + col,
+                                currentPiece.y + row,
+                                currentPiece.color,
+                                currentPiece.glow,
+                                BLOCK_SIZE
+                            );
+                        }
+                    }
+                }
+            }
+        }
+
+        function drawGhostPiece() {
+            // Find where the piece would land
+            let ghostY = currentPiece.y;
+            while (isValidPosition(currentPiece.x, ghostY + 1, currentPiece.shape)) {
+                ghostY++;
+            }
+            
+            // Draw ghost
+            ctx.globalAlpha = 0.3;
+            for (let row = 0; row < currentPiece.shape.length; row++) {
+                for (let col = 0; col < currentPiece.shape[row].length; col++) {
+                    if (currentPiece.shape[row][col]) {
+                        drawBlock(
+                            ctx,
+                            currentPiece.x + col,
+                            ghostY + row,
+                            currentPiece.color,
+                            currentPiece.glow,
+                            BLOCK_SIZE
+                        );
+                    }
+                }
+            }
+            ctx.globalAlpha = 1;
+        }
+
+        function drawBlock(context, x, y, color, glow, size) {
+            const padding = 2;
+            const xPos = x * size + padding;
+            const yPos = y * size + padding;
+            const blockSize = size - padding * 2;
+            
+            // Glow effect
+            context.shadowColor = glow;
+            context.shadowBlur = 8;
+            
+            // Main block
+            context.fillStyle = color;
+            context.fillRect(xPos, yPos, blockSize, blockSize);
+            
+            // Highlight (top-left)
+            context.fillStyle = 'rgba(255, 255, 255, 0.3)';
+            context.fillRect(xPos, yPos, blockSize, 3);
+            context.fillRect(xPos, yPos, 3, blockSize);
+            
+            // Shadow (bottom-right)
+            context.fillStyle = 'rgba(0, 0, 0, 0.3)';
+            context.fillRect(xPos, yPos + blockSize - 3, blockSize, 3);
+            context.fillRect(xPos + blockSize - 3, yPos, 3, blockSize);
+            
+            // Reset shadow
+            context.shadowBlur = 0;
+        }
+
+        function drawNextPiece() {
+            nextCtx.fillStyle = 'rgba(5, 10, 5, 0.95)';
+            nextCtx.fillRect(0, 0, nextCanvas.width, nextCanvas.height);
+            
+            const shape = nextPiece.shape;
+            const offsetX = (4 - shape[0].length) / 2;
+            const offsetY = (4 - shape.length) / 2;
+            
+            for (let row = 0; row < shape.length; row++) {
+                for (let col = 0; col < shape[row].length; col++) {
+                    if (shape[row][col]) {
+                        drawBlock(
+                            nextCtx,
+                            offsetX + col,
+                            offsetY + row,
+                            nextPiece.color,
+                            nextPiece.glow,
+                            PREVIEW_BLOCK_SIZE
+                        );
+                    }
+                }
+            }
+        }
+
+        function updateScoreDisplay() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('level').textContent = level;
+            document.getElementById('lines').textContent = lines;
+        }
+
+        function setMessage(msg) {
+            document.getElementById('message').textContent = msg;
+        }
+
+        // Occasionally show random HHGG messages
+        setInterval(() => {
+            if (!gameOver && !paused && Math.random() < 0.1) {
+                const msg = RANDOM_MESSAGES[Math.floor(Math.random() * RANDOM_MESSAGES.length)];
+                setMessage(msg);
+            }
+        }, 15000);
+
+        // ===================
+        // AUDIO
+        // ===================
+
+        function playSound(type) {
+            if (!soundEnabled || !audioCtx) return;
+            
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            switch (type) {
+                case 'move':
+                    oscillator.frequency.value = 200;
+                    oscillator.type = 'square';
+                    gainNode.gain.value = 0.05;
+                    oscillator.start();
+                    oscillator.stop(audioCtx.currentTime + 0.05);
+                    break;
+                case 'rotate':
+                    oscillator.frequency.value = 300;
+                    oscillator.type = 'sine';
+                    gainNode.gain.value = 0.08;
+                    oscillator.start();
+                    oscillator.stop(audioCtx.currentTime + 0.08);
+                    break;
+                case 'drop':
+                    oscillator.frequency.value = 150;
+                    oscillator.type = 'triangle';
+                    gainNode.gain.value = 0.15;
+                    oscillator.start();
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+                    oscillator.stop(audioCtx.currentTime + 0.2);
+                    break;
+                case 'clear':
+                    oscillator.frequency.value = 440;
+                    oscillator.type = 'sine';
+                    gainNode.gain.value = 0.12;
+                    oscillator.start();
+                    oscillator.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.15);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                    oscillator.stop(audioCtx.currentTime + 0.3);
+                    break;
+                case 'gameOver':
+                    oscillator.frequency.value = 440;
+                    oscillator.type = 'sawtooth';
+                    gainNode.gain.value = 0.1;
+                    oscillator.start();
+                    oscillator.frequency.exponentialRampToValueAtTime(55, audioCtx.currentTime + 1);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 1);
+                    oscillator.stop(audioCtx.currentTime + 1);
+                    break;
+            }
+        }
+
+        // ===================
+        // START THE GAME
+        // ===================
+
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>
+
