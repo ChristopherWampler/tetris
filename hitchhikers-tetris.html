@@ -2,8 +2,15 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
     <title>DON'T PANIC: The Tetris Edition</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="HHGG Tetris">
+    <link rel="apple-touch-icon" href="icons/icon-180x180.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152x152.png">
+    <meta name="theme-color" content="#00ff41">
     <style>
         /* ============================================
            HITCHHIKER'S GUIDE TO THE GALAXY - TETRIS
@@ -34,6 +41,10 @@
             --panel-border: #1a3a1a;
             --panel-bg: rgba(0, 20, 0, 0.85);
             --text-dim: #4a6a4a;
+            --safe-area-inset-top: env(safe-area-inset-top);
+            --safe-area-inset-bottom: env(safe-area-inset-bottom);
+            --safe-area-inset-left: env(safe-area-inset-left);
+            --safe-area-inset-right: env(safe-area-inset-right);
         }
 
         body {
@@ -42,7 +53,13 @@
             font-family: 'Courier New', 'Lucida Console', monospace;
             min-height: 100vh;
             overflow: hidden;
-            position: relative;
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            padding-top: var(--safe-area-inset-top);
+            padding-bottom: var(--safe-area-inset-bottom);
+            padding-left: var(--safe-area-inset-left);
+            padding-right: var(--safe-area-inset-right);
         }
 
         /* Animated Starfield Background */
@@ -466,29 +483,119 @@
         }
 
         @media (max-width: 900px) {
+            .main-title {
+                font-size: 1.8rem;
+                letter-spacing: 2px;
+            }
+
+            .subtitle {
+                font-size: 0.8rem;
+            }
+
+            .game-container {
+                padding: 10px;
+                padding-top: max(10px, env(safe-area-inset-top));
+                padding-bottom: max(10px, env(safe-area-inset-bottom));
+            }
+
             .game-layout {
                 flex-direction: column;
-                align-items: center;
+                gap: 15px;
             }
-            
+
             .guide-panel {
                 display: none;
             }
-            
+
             .side-panel {
                 flex-direction: row;
                 flex-wrap: wrap;
                 width: 100%;
-                justify-content: center;
+                gap: 8px;
             }
-            
+
             .stat-box {
-                flex: 1;
-                min-width: 150px;
+                flex: 1 1 auto;
+                min-width: 90px;
+                max-width: 150px;
+                padding: 8px;
             }
-            
+
+            .stat-label {
+                font-size: 0.6rem;
+            }
+
+            .stat-value {
+                font-size: 1.2rem;
+            }
+
             .touch-controls {
                 display: flex;
+                gap: 8px;
+                width: 100%;
+                max-width: 500px;
+                padding-bottom: env(safe-area-inset-bottom, 10px);
+            }
+
+            .touch-btn {
+                flex: 1;
+                min-width: 44px;
+                min-height: 44px;
+                padding: 12px 20px;
+                font-size: 1.3rem;
+                border-radius: 12px;
+                transition: all 0.1s ease;
+                user-select: none;
+                -webkit-tap-highlight-color: transparent;
+            }
+
+            .touch-btn:active {
+                transform: scale(0.95);
+                box-shadow: 0 0 20px rgba(0, 255, 65, 0.6);
+            }
+
+            .touch-btn-pause {
+                flex: 0.7;
+            }
+        }
+
+        /* iPhone SE optimizations */
+        @media (max-width: 375px) and (max-height: 667px) {
+            .main-title {
+                font-size: 1.5rem;
+            }
+
+            .touch-btn {
+                padding: 10px 15px;
+                font-size: 1.1rem;
+                min-height: 40px;
+            }
+        }
+
+        /* Landscape mode */
+        @media (max-width: 900px) and (orientation: landscape) {
+            .game-container {
+                padding: 5px;
+            }
+
+            .main-title {
+                font-size: 1.3rem;
+            }
+
+            .subtitle {
+                display: none;
+            }
+
+            .touch-btn {
+                padding: 8px 12px;
+                min-height: 36px;
+            }
+        }
+
+        /* Disable CRT effect on mobile for performance */
+        @media (max-width: 900px) {
+            .crt-overlay {
+                display: none;
             }
         }
     </style>
@@ -616,6 +723,7 @@
             <button class="touch-btn" id="btnRotate">↻</button>
             <button class="touch-btn" id="btnRight">→</button>
             <button class="touch-btn" id="btnDrop">⬇</button>
+            <button class="touch-btn touch-btn-pause" id="btnPause">⏸</button>
         </div>
     </div>
 
@@ -644,8 +752,27 @@
         
         const COLS = 10;
         const ROWS = 20;
-        const BLOCK_SIZE = 30;
-        const PREVIEW_BLOCK_SIZE = 20;
+        let BLOCK_SIZE = 30;
+        let PREVIEW_BLOCK_SIZE = 20;
+
+        function calculateBlockSize() {
+            const vw = window.innerWidth;
+            const vh = window.innerHeight;
+            const isMobile = vw < 900;
+
+            if (isMobile) {
+                const availableHeight = vh - 320; // Account for UI
+                const availableWidth = vw - 40;
+                const heightBasedSize = Math.floor(availableHeight / ROWS);
+                const widthBasedSize = Math.floor(availableWidth / COLS);
+                BLOCK_SIZE = Math.max(20, Math.min(35, Math.min(heightBasedSize, widthBasedSize)));
+                PREVIEW_BLOCK_SIZE = Math.floor(BLOCK_SIZE * 0.66);
+            } else {
+                BLOCK_SIZE = 30;
+                PREVIEW_BLOCK_SIZE = 20;
+            }
+            return BLOCK_SIZE;
+        }
 
         // Tetromino definitions with HHGG theming
         // Each piece has: shape matrices for rotations, color, and HHGG name
@@ -780,7 +907,18 @@
         let soundEnabled = true;
         let hasAchievedFirstTetris = false;
         let milestoneFlags = {};
-        
+
+        // Touch gesture tracking
+        let touchStartX = 0;
+        let touchStartY = 0;
+        let touchStartTime = 0;
+        let isSwiping = false;
+        const SWIPE_THRESHOLD = 30; // pixels
+
+        // Touch button management
+        let repeatIntervalId = null;
+        let touchButtonActive = null;
+
         // Audio context for sound effects
         let audioCtx = null;
 
@@ -789,6 +927,9 @@
         // ===================
 
         function init() {
+            // Calculate optimal block size for current viewport
+            calculateBlockSize();
+
             // Setup canvases
             canvas = document.getElementById('gameBoard');
             ctx = canvas.getContext('2d');
@@ -812,6 +953,16 @@
 
             // Setup event listeners
             setupEventListeners();
+
+            // Setup resize handlers for responsive design
+            window.addEventListener('resize', handleResize);
+            window.addEventListener('orientationchange', handleResize);
+
+            // Setup touch gesture handlers for mobile swipe controls
+            const gameBoard = document.getElementById('gameBoard');
+            gameBoard.addEventListener('touchstart', handleTouchStart, {passive: false});
+            gameBoard.addEventListener('touchmove', handleTouchMove, {passive: false});
+            gameBoard.addEventListener('touchend', handleTouchEnd, {passive: false});
 
             // Initialize audio context on first user interaction
             document.addEventListener('click', initAudio, { once: true });
@@ -846,17 +997,51 @@
             }
         }
 
+        function setupTouchButton(buttonId, action, enableRepeat) {
+            const button = document.getElementById(buttonId);
+            if (!button) return;
+
+            const startHandler = (e) => {
+                e.preventDefault();
+                if (gameOver) return;
+                touchButtonActive = buttonId;
+                action();
+
+                if (enableRepeat && !paused) {
+                    repeatIntervalId = setInterval(() => {
+                        if (touchButtonActive === buttonId && !paused) {
+                            action();
+                        }
+                    }, 100);
+                }
+            };
+
+            const endHandler = (e) => {
+                e.preventDefault();
+                if (repeatIntervalId) {
+                    clearInterval(repeatIntervalId);
+                    repeatIntervalId = null;
+                }
+                touchButtonActive = null;
+            };
+
+            button.addEventListener('touchstart', startHandler);
+            button.addEventListener('touchend', endHandler);
+            button.addEventListener('touchcancel', endHandler);
+        }
+
         function setupEventListeners() {
             document.addEventListener('keydown', handleKeyDown);
-            
+
             // Sound toggle
             document.getElementById('soundToggle').addEventListener('click', toggleSound);
-            
-            // Touch controls
-            document.getElementById('btnLeft').addEventListener('touchstart', (e) => { e.preventDefault(); movePiece(-1, 0); });
-            document.getElementById('btnRight').addEventListener('touchstart', (e) => { e.preventDefault(); movePiece(1, 0); });
-            document.getElementById('btnRotate').addEventListener('touchstart', (e) => { e.preventDefault(); rotatePiece(); });
-            document.getElementById('btnDrop').addEventListener('touchstart', (e) => { e.preventDefault(); hardDrop(); });
+
+            // Enhanced touch controls with hold-to-repeat
+            setupTouchButton('btnLeft', () => movePiece(-1, 0), true);
+            setupTouchButton('btnRight', () => movePiece(1, 0), true);
+            setupTouchButton('btnRotate', () => rotatePiece(), false);
+            setupTouchButton('btnDrop', () => hardDrop(), false);
+            setupTouchButton('btnPause', () => togglePause(), false);
         }
 
         function handleKeyDown(e) {
@@ -1003,7 +1188,10 @@
             if (isValidPosition(newX, newY, currentPiece.shape)) {
                 currentPiece.x = newX;
                 currentPiece.y = newY;
-                if (dx !== 0) playSound('move');
+                if (dx !== 0) {
+                    playSound('move');
+                    triggerHaptic('light');
+                }
                 return true;
             }
             return false;
@@ -1019,9 +1207,10 @@
                 currentPiece.rotation = nextRotation;
                 currentPiece.shape = nextShape;
                 playSound('rotate');
+                triggerHaptic('medium');
                 return;
             }
-            
+
             // Wall kick attempts
             const kicks = [-1, 1, -2, 2];
             for (const kick of kicks) {
@@ -1030,6 +1219,7 @@
                     currentPiece.rotation = nextRotation;
                     currentPiece.shape = nextShape;
                     playSound('rotate');
+                    triggerHaptic('medium');
                     return;
                 }
             }
@@ -1044,6 +1234,7 @@
             updateScoreDisplay();
             lockPiece();
             playSound('drop');
+            triggerHaptic('heavy');
         }
 
         function lockPiece() {
@@ -1086,7 +1277,8 @@
                 // Visual effects
                 triggerLineClearEffect(linesToClear);
                 createParticles(linesToClear);
-                
+                triggerHaptic('success');
+
                 // Remove lines
                 for (const row of linesToClear) {
                     grid.splice(row, 1);
@@ -1204,8 +1396,9 @@
             document.getElementById('finalScore').textContent = 
                 `Improbability Factor: ${score} | Dimensional Shift: ${level} | Reality Distortions: ${lines}`;
             document.getElementById('gameOverOverlay').classList.add('active');
-            
+
             playSound('gameOver');
+            triggerHaptic('error');
         }
 
         // ===================
@@ -1433,10 +1626,127 @@
         }
 
         // ===================
+        // TOUCH GESTURE HANDLERS
+        // ===================
+
+        function handleTouchStart(e) {
+            if (gameOver || paused) return;
+            e.preventDefault();
+            const touch = e.touches[0];
+            touchStartX = touch.clientX;
+            touchStartY = touch.clientY;
+            touchStartTime = Date.now();
+            isSwiping = true;
+        }
+
+        function handleTouchMove(e) {
+            if (!isSwiping || gameOver || paused) return;
+            e.preventDefault();
+        }
+
+        function handleTouchEnd(e) {
+            if (!isSwiping || gameOver || paused) return;
+            e.preventDefault();
+            isSwiping = false;
+
+            const touch = e.changedTouches[0];
+            const deltaX = touch.clientX - touchStartX;
+            const deltaY = touch.clientY - touchStartY;
+            const absX = Math.abs(deltaX);
+            const absY = Math.abs(deltaY);
+
+            if (absX < SWIPE_THRESHOLD && absY < SWIPE_THRESHOLD) return;
+
+            if (absX > absY) {
+                // Horizontal swipe
+                if (deltaX > 0) {
+                    movePiece(1, 0); // Swipe right
+                } else {
+                    movePiece(-1, 0); // Swipe left
+                }
+            } else {
+                // Vertical swipe
+                if (deltaY > 0) {
+                    hardDrop(); // Swipe down
+                } else {
+                    rotatePiece(); // Swipe up
+                }
+            }
+        }
+
+        // ===================
+        // HAPTIC FEEDBACK SYSTEM
+        // ===================
+
+        const supportsHaptics = 'vibrate' in navigator;
+        let hapticsEnabled = true;
+
+        // Respect user's reduced motion preference
+        if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
+            hapticsEnabled = false;
+        }
+
+        function triggerHaptic(type) {
+            if (!supportsHaptics || !hapticsEnabled) return;
+
+            try {
+                switch (type) {
+                    case 'light':
+                        navigator.vibrate(10);
+                        break;
+                    case 'medium':
+                        navigator.vibrate(20);
+                        break;
+                    case 'heavy':
+                        navigator.vibrate(40);
+                        break;
+                    case 'success':
+                        navigator.vibrate([30, 50, 50]);
+                        break;
+                    case 'error':
+                        navigator.vibrate([50, 100, 50, 100, 100]);
+                        break;
+                    default:
+                        navigator.vibrate(20);
+                }
+            } catch (e) {
+                console.log('Haptic failed:', e);
+            }
+        }
+
+        // ===================
+        // RESPONSIVE RESIZE HANDLER
+        // ===================
+
+        function handleResize() {
+            const oldSize = BLOCK_SIZE;
+            calculateBlockSize();
+            if (oldSize !== BLOCK_SIZE) {
+                canvas.width = COLS * BLOCK_SIZE;
+                canvas.height = ROWS * BLOCK_SIZE;
+                nextCanvas.width = 4 * PREVIEW_BLOCK_SIZE;
+                nextCanvas.height = 4 * PREVIEW_BLOCK_SIZE;
+                render();
+                drawNextPiece();
+            }
+        }
+
+        // ===================
         // START THE GAME
         // ===================
 
         window.addEventListener('load', init);
+
+        // ===================
+        // SERVICE WORKER REGISTRATION
+        // ===================
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('SW registered:', reg.scope))
+                    .catch(err => console.log('SW failed:', err));
+            });
+        }
     </script>
 </body>
 </html>

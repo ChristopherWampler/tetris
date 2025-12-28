@@ -25,6 +25,11 @@ A fully-featured Tetris game with a retro CRT aesthetic, inspired by "The Hitchh
 - 💾 Local high score persistence
 - ⌨️ Keyboard controls: Arrow keys, Space (hard drop), P (pause), R (restart)
 - 🎨 HHGG-themed piece names and messages
+- 📱 **Progressive Web App (PWA) - installable on iPhone/Android**
+- 📱 **Advanced mobile controls with swipe gestures**
+- 📳 **Haptic feedback for immersive gameplay**
+- 🎨 **Responsive design with dynamic sizing**
+- 🔒 **iOS safe area support (notch/Dynamic Island)**
 
 ## Screenshots
 
@@ -139,7 +144,32 @@ This is a learning project! The game is a standalone HTML file, and the Express 
 - **P** - Pause/Resume
 - **R** - Restart (after game over)
 
-**Mobile:** Touch controls appear at the bottom of the screen
+## Mobile Controls
+
+### Swipe Gestures
+- **Swipe Left/Right** - Move piece
+- **Swipe Up** - Rotate
+- **Swipe Down** - Hard drop
+
+### Touch Buttons
+- **← →** - Move (hold to repeat)
+- **↻** - Rotate
+- **⬇** - Hard drop
+- **⏸** - Pause
+
+### Installing as App (PWA)
+**iPhone:**
+1. Open in Safari
+2. Tap Share → Add to Home Screen
+3. Tap Add
+
+**Android:**
+1. Open in Chrome
+2. Tap menu → Add to Home screen
+
+### Haptic Feedback
+Light tap on movement, pulse on rotation, buzz on drop, success pattern on line clears.
+*Respects system Reduce Motion preferences*
 
 ## Contributing
 
