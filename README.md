@@ -5,6 +5,10 @@
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Node](https://img.shields.io/badge/node-20%2B-green.svg)
 
+## 🎮 [**PLAY NOW**](https://christopherwampler.github.io/tetris) 🎮
+
+👉 **[https://christopherwampler.github.io/tetris](https://christopherwampler.github.io/tetris)** 👈
+
 ![Tetris Gameplay](docs/screenshots/gameplay.png)
 
 ## About
@@ -34,9 +38,15 @@ A fully-featured Tetris game with a retro CRT aesthetic, inspired by "The Hitchh
 
 ## Quick Start
 
-### Play the Game (Easiest Way)
+### 🌐 Play Online (Easiest Way!)
 
-Just open `hitchhikers-tetris.html` in your browser - no installation needed!
+**Just visit:** [https://christopherwampler.github.io/tetris](https://christopherwampler.github.io/tetris)
+
+No installation, no download - just click and play!
+
+### 💻 Play Locally
+
+Download `hitchhikers-tetris.html` or `index.html` from this repository and open it in your browser - no server needed!
 
 ### Run with Node.js Backend (Learning Project)
 
