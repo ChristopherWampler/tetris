@@ -90,15 +90,24 @@ Then visit http://localhost:3000
 
 ```
 tetris/
-├── hitchhikers-tetris.html    # Standalone game (just open in browser!)
+├── index.html                     # Main game file (PWA-enabled, GitHub Pages)
+├── hitchhikers-tetris.html        # Standalone version (same as index.html)
+├── manifest.json                  # PWA manifest for installability
+├── sw.js                          # Service worker for offline support
+├── icons/                         # PWA icons (72x72 to 512x512)
+│   ├── icon.svg                   # Source SVG icon
+│   └── icon-*.png                 # Generated PNG icons
 ├── src/
-│   └── index.ts               # Simple Express server (learning project)
+│   └── index.ts                   # Simple Express server (learning project)
+├── scripts/
+│   └── generate-icons.js          # Automated icon generation script
 ├── docs/
-│   └── screenshots/           # Game screenshots
-├── package.json               # Node.js dependencies
-├── Dockerfile                 # Docker configuration
-├── docker-compose.yml         # Docker orchestration
-└── README.md                  # You are here
+│   └── screenshots/               # Game screenshots
+├── package.json                   # Node.js dependencies
+├── MOBILE_TEST_CHECKLIST.md       # QA checklist for mobile testing
+├── Dockerfile                     # Docker configuration
+├── docker-compose.yml             # Docker orchestration
+└── README.md                      # You are here
 ```
 
 ## Development
@@ -112,6 +121,25 @@ This is a learning project! The game is a standalone HTML file, and the Express 
 - `npm start` - Run the compiled server
 - `npm run lint` - Check code quality with ESLint
 - `npm run format` - Format code with Prettier
+- `npm run generate-icons` - Generate PWA icon files from SVG source
+
+### PWA Icon Generation
+
+The project includes an automated icon generation script that creates all required PNG icons from the source SVG:
+
+```bash
+# Generate all PWA icons (72x72 through 512x512)
+npm run generate-icons
+```
+
+**Requirements:**
+- The script uses `sharp` (already in devDependencies)
+- Source SVG: `icons/icon.svg`
+- Output: `icons/icon-{size}x{size}.png`
+
+**Alternative:** Use online tools if you prefer:
+- [RealFaviconGenerator](https://realfavicongenerator.net/)
+- [PWABuilder Image Generator](https://www.pwabuilder.com/imageGenerator)
 
 ### Development Conventions
 
@@ -156,6 +184,7 @@ This is a learning project! The game is a standalone HTML file, and the Express 
 - **↻** - Rotate
 - **⬇** - Hard drop
 - **⏸** - Pause
+- **↻ TRY AGAIN** - Restart game (shown after game over on mobile)
 
 ### Installing as App (PWA)
 **iPhone:**
@@ -166,6 +195,22 @@ This is a learning project! The game is a standalone HTML file, and the Express 
 **Android:**
 1. Open in Chrome
 2. Tap menu → Add to Home screen
+
+### PWA Troubleshooting
+
+**"Add to Home Screen" option not appearing?**
+- **iOS:** Must use Safari browser (not Chrome/Firefox)
+- **Android:** Must use Chrome browser
+- **Both:** Ensure you're on HTTPS (works with localhost for testing)
+- **Both:** Service worker must register successfully (check browser console)
+
+**App not working offline?**
+- Open the app once while online to cache assets
+- Check that service worker is registered (DevTools → Application → Service Workers)
+
+**Icons not showing?**
+- Clear browser cache and reinstall
+- For developers: Run `npm run generate-icons` to create icon files
 
 ### Haptic Feedback
 Light tap on movement, pulse on rotation, buzz on drop, success pattern on line clears.

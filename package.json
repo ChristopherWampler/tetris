@@ -9,7 +9,8 @@
     "dev": "tsc --watch",
     "start": "node dist/index.js",
     "lint": "eslint src --ext .ts",
-    "format": "prettier --write \"src/**/*.ts\""
+    "format": "prettier --write \"src/**/*.ts\"",
+    "generate-icons": "node scripts/generate-icons.js"
   },
   "keywords": [
     "tetris",
@@ -41,6 +42,7 @@
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
     "prettier": "^3.2.4",
+    "sharp": "^0.33.5",
     "typescript": "^5.3.3"
   }
 }

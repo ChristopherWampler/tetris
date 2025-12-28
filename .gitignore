@@ -32,7 +32,3 @@ coverage/
 
 # MCP files (after moving screenshots)
 .playwright-mcp/
-
-# PWA icons (until generated)
-icons/*.png
-!icons/icon.svg
