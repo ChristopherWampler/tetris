@@ -557,7 +557,10 @@
         }
 
         .touch-btn {
-            background: var(--panel-bg);
+            /* iOS-style glass morphism */
+            background: rgba(0, 20, 0, 0.4);
+            backdrop-filter: blur(10px) saturate(150%);
+            -webkit-backdrop-filter: blur(10px) saturate(150%);
             border: 2px solid var(--electric-green);
             color: var(--electric-green);
             font-size: 1.5rem;
@@ -567,18 +570,21 @@
             touch-action: manipulation;
             user-select: none;
             -webkit-tap-highlight-color: transparent;
-            transition: all 0.1s ease;
+            position: relative;
+            overflow: visible;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 4px 12px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), background 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
-        /* Enhanced button press feedback */
+        /* Enhanced iOS-style button press feedback */
         .touch-btn:active {
-            transform: scale(0.92);
-            background: var(--electric-green);
+            transform: scale(0.95);
+            filter: brightness(1.3);
             color: var(--space-black);
-            box-shadow: 0 0 25px rgba(0, 255, 65, 0.7);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 0 30px rgba(0, 255, 65, 0.6), 0 8px 16px rgba(0, 0, 0, 0.3);
         }
 
         /* Movement buttons - larger for thumb ergonomics */
@@ -598,8 +604,8 @@
         }
 
         .touch-btn-soft:active {
-            background: var(--towel-green);
-            box-shadow: 0 0 25px rgba(38, 222, 129, 0.7);
+            filter: brightness(1.3);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 0 30px rgba(38, 222, 129, 0.6), 0 8px 16px rgba(0, 0, 0, 0.3);
         }
 
         /* Rotate button - accent color */
@@ -612,8 +618,8 @@
         }
 
         .touch-btn-rotate:active {
-            background: var(--amber);
-            box-shadow: 0 0 25px rgba(255, 176, 0, 0.7);
+            filter: brightness(1.3);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 0 30px rgba(255, 176, 0, 0.6), 0 8px 16px rgba(0, 0, 0, 0.3);
         }
 
         /* Hard drop button - intense */
@@ -626,8 +632,8 @@
         }
 
         .touch-btn-drop:active {
-            background: var(--vogon-red);
-            box-shadow: 0 0 25px rgba(255, 71, 87, 0.7);
+            filter: brightness(1.3);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 0 30px rgba(255, 71, 87, 0.6), 0 8px 16px rgba(0, 0, 0, 0.3);
         }
 
         /* Pause button - subdued */
@@ -636,6 +642,77 @@
             min-height: 50px;
             font-size: 1.2rem;
             opacity: 0.8;
+        }
+
+        /* Fallback for browsers without backdrop-filter support */
+        @supports not (backdrop-filter: blur(10px)) {
+            .touch-btn {
+                background: rgba(0, 20, 0, 0.85);
+            }
+        }
+
+        /* ===================
+           PULSING RING ANIMATION
+           =================== */
+
+        /* Green ring animation for button press feedback */
+        .touch-btn::before {
+            content: '';
+            position: absolute;
+            top: -4px;
+            left: -4px;
+            right: -4px;
+            bottom: -4px;
+            border: 3px solid var(--electric-green);
+            border-radius: 14px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.1s ease;
+        }
+
+        .touch-btn.ring-active::before {
+            opacity: 1;
+            animation: ringPulse 1s ease-in-out infinite;
+        }
+
+        @keyframes ringPulse {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 0.8;
+                box-shadow: 0 0 20px rgba(0, 255, 65, 0.6);
+            }
+            50% {
+                transform: scale(1.03);
+                opacity: 1;
+                box-shadow: 0 0 30px rgba(0, 255, 65, 0.8);
+            }
+        }
+
+        /* Color-specific ring variants */
+        .touch-btn-soft.ring-active::before {
+            border-color: var(--towel-green);
+            animation: ringPulseSoft 1s ease-in-out infinite;
+        }
+
+        @keyframes ringPulseSoft {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 0.8;
+                box-shadow: 0 0 20px rgba(38, 222, 129, 0.6);
+            }
+            50% {
+                transform: scale(1.03);
+                opacity: 1;
+                box-shadow: 0 0 30px rgba(38, 222, 129, 0.8);
+            }
+        }
+
+        .touch-btn-rotate.ring-active::before {
+            border-color: var(--amber);
+        }
+
+        .touch-btn-drop.ring-active::before {
+            border-color: var(--vogon-red);
         }
 
         @media (max-width: 900px) {
@@ -727,6 +804,12 @@
             .mobile-only {
                 display: block;
             }
+
+            /* Reduce blur for mobile performance */
+            .touch-btn {
+                backdrop-filter: blur(8px) saturate(140%);
+                -webkit-backdrop-filter: blur(8px) saturate(140%);
+            }
         }
 
         /* iPhone SE optimizations */
@@ -783,6 +866,15 @@
             .touch-btn-pause {
                 min-height: 40px;
                 font-size: 1.2rem;
+            }
+
+            /* Smaller ring on small screens */
+            .touch-btn::before {
+                top: -3px;
+                left: -3px;
+                right: -3px;
+                bottom: -3px;
+                border-width: 2px;
             }
         }
 
@@ -1306,6 +1398,10 @@
                 e.preventDefault();
                 if (gameOver) return;
                 touchButtonActive = buttonId;
+
+                // Add ring animation
+                button.classList.add('ring-active');
+
                 action();
 
                 if (enableRepeat && !paused) {
@@ -1319,6 +1415,10 @@
 
             const endHandler = (e) => {
                 e.preventDefault();
+
+                // Remove ring animation
+                button.classList.remove('ring-active');
+
                 if (repeatIntervalId) {
                     clearInterval(repeatIntervalId);
                     repeatIntervalId = null;
@@ -1332,6 +1432,9 @@
         }
 
         function setupEventListeners() {
+            // Initialize haptic feedback system
+            initHaptics();
+
             document.addEventListener('keydown', handleKeyDown);
 
             // Sound toggle
@@ -1356,8 +1459,51 @@
                 if (movePiece(0, 1)) {
                     score += 1; // Soft drop bonus
                     updateScoreDisplay();
+                    triggerHaptic(HAPTIC_PATTERNS.light);
                 }
             }, true);
+        }
+
+        // ===================
+        // HAPTIC FEEDBACK SYSTEM
+        // ===================
+
+        // Haptic patterns for different game events
+        // Duration guidelines: Light (10-20ms), Medium (30-40ms), Strong (50-100ms)
+        const HAPTIC_PATTERNS = {
+            light: 15,                      // Movement
+            medium: 30,                     // Rotation, piece lock
+            strong: 50,                     // Hard drop
+            success: [30, 20, 30],          // Line clear pattern
+            tetris: [50, 30, 50, 30, 100],  // 4-line clear celebration
+            fail: 10                        // Blocked move
+        };
+
+        // Feature detection
+        let hapticSupported = false;
+        let hapticEnabled = true;
+
+        function initHaptics() {
+            hapticSupported = 'vibrate' in navigator;
+            const savedPref = localStorage.getItem('hapticEnabled');
+            if (savedPref !== null) {
+                hapticEnabled = savedPref === 'true';
+            }
+            console.log('Haptics:', hapticSupported ? 'supported' : 'not supported');
+        }
+
+        function triggerHaptic(pattern) {
+            if (!hapticSupported || !hapticEnabled || paused || gameOver) return;
+
+            try {
+                if (typeof pattern === 'number') {
+                    navigator.vibrate(pattern);
+                } else if (Array.isArray(pattern)) {
+                    navigator.vibrate(pattern);
+                }
+            } catch (error) {
+                console.warn('Haptic feedback failed:', error);
+            }
         }
 
         function handleKeyDown(e) {
@@ -1403,6 +1549,21 @@
 
         function togglePause() {
             paused = !paused;
+
+            if (paused) {
+                // Clear any active button rings when pausing
+                document.querySelectorAll('.touch-btn.ring-active').forEach(btn => {
+                    btn.classList.remove('ring-active');
+                });
+
+                // Clear repeat interval
+                if (repeatIntervalId) {
+                    clearInterval(repeatIntervalId);
+                    repeatIntervalId = null;
+                }
+                touchButtonActive = null;
+            }
+
             document.getElementById('pauseOverlay').classList.toggle('active', paused);
             if (!paused) {
                 lastDropTime = performance.now();
@@ -1500,15 +1661,17 @@
         function movePiece(dx, dy) {
             const newX = currentPiece.x + dx;
             const newY = currentPiece.y + dy;
-            
+
             if (isValidPosition(newX, newY, currentPiece.shape)) {
                 currentPiece.x = newX;
                 currentPiece.y = newY;
                 if (dx !== 0) {
                     playSound('move');
+                    triggerHaptic(HAPTIC_PATTERNS.light);
                 }
                 return true;
             }
+            triggerHaptic(HAPTIC_PATTERNS.fail);
             return false;
         }
 
@@ -1523,6 +1686,7 @@
                 currentPiece.shape = nextShape;
                 playSound('rotate');
                 triggerVisualFeedback('rotate');
+                triggerHaptic(HAPTIC_PATTERNS.medium);
                 return;
             }
 
@@ -1535,6 +1699,7 @@
                     currentPiece.shape = nextShape;
                     playSound('rotate');
                     triggerVisualFeedback('rotate');
+                    triggerHaptic(HAPTIC_PATTERNS.medium);
                     return;
                 }
             }
@@ -1550,6 +1715,7 @@
             lockPiece();
             playSound('drop');
             triggerVisualFeedback('hardDrop');
+            triggerHaptic(HAPTIC_PATTERNS.strong);
         }
 
         function lockPiece() {
@@ -1568,10 +1734,11 @@
                     }
                 }
             }
-            
+
             // Visual feedback for piece locking
             triggerVisualFeedback('lock');
-            
+            triggerHaptic(HAPTIC_PATTERNS.medium);
+
             // Check for line clears
             clearLines();
             
@@ -1595,6 +1762,15 @@
                 // Visual effects
                 triggerLineClearEffect(linesToClear);
                 createParticles(linesToClear);
+
+                // Graduated haptic feedback
+                if (linesCleared === 4) {
+                    triggerHaptic(HAPTIC_PATTERNS.tetris);
+                } else if (linesCleared >= 2) {
+                    triggerHaptic(HAPTIC_PATTERNS.success);
+                } else {
+                    triggerHaptic(HAPTIC_PATTERNS.strong);
+                }
 
                 // Remove lines
                 for (const row of linesToClear) {

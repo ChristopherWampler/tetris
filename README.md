@@ -27,14 +27,15 @@ This learning project showcases modern web development techniques—combining a 
 - 🌌 Animated starfield background
 - 💚 CRT scanline effects and retro green terminal styling
 - 🎮 Full Tetris mechanics (rotation, scoring, progressive levels)
-- 📱 Mobile-responsive touch controls
+- 📱 **Premium iOS-style mobile controls** with glass morphism and haptic feedback
 - 🔊 Sound effects toggle
 - 💾 Local high score persistence
 - ⌨️ Keyboard controls: Arrow keys, Space (hard drop), P (pause), R (restart)
 - 🎨 HHGG-themed piece names and messages
 - 📱 **Progressive Web App (PWA) - installable on iPhone/Android**
-- 📱 **Advanced mobile controls with swipe gestures**
-- 📳 **Haptic feedback for immersive gameplay**
+- ✨ **iOS glass morphism buttons** with frosted blur and spring animations
+- 💚 **Pulsing ring feedback** - visual confirmation while holding buttons
+- 📳 **Tactile haptic feedback** - feel every move, rotation, and line clear
 - 🎨 **Responsive design with dynamic sizing**
 - 🔒 **iOS safe area support (notch/Dynamic Island)**
 
@@ -47,6 +48,40 @@ This learning project showcases modern web development techniques—combining a 
 ### More Action
 ![Gameplay in Action](docs/screenshots/gameplay-action.png)
 *Showing score progression and different colored pieces*
+
+## ✨ NEW: Premium iOS Mobile Experience
+
+Experience Tetris like never before on iPhone with our stunning new mobile controls!
+
+### 🎨 iOS Glass Morphism Design
+Beautiful frosted glass buttons with translucent blur effects, just like iOS Control Center. Each button features:
+- **Spring bounce animations** - that signature iOS responsiveness
+- **Subtle inner glow** for premium polish
+- **Smart brightness feedback** - buttons gently brighten when pressed
+- **Color-coded controls** - instantly recognize each button type
+
+### 💚 Pulsing Ring Feedback
+Never wonder if you're holding a button - a glowing ring appears and pulses continuously while you hold:
+- Electric green for movement buttons
+- Towel green for soft drop
+- Amber for rotate
+- Red for hard drop
+
+### 📳 Tactile Haptic Feedback
+Feel the game through your fingertips with carefully crafted vibrations:
+- **Light taps** when moving pieces
+- **Medium feedback** for rotations and piece locks
+- **Strong impact** for hard drops
+- **Rhythmic patterns** for line clears
+- **Special celebration** for Tetris (4 lines!) - you'll feel the excitement!
+
+### ⚡ Optimized for Performance
+- Smooth 60fps gameplay even with all visual effects
+- Battery-friendly haptic durations
+- GPU-accelerated animations
+- Works beautifully on iPhone SE to iPhone 14 Pro Max
+
+**Try it now on your iPhone!** Visit [https://christopherwampler.github.io/tetris](https://christopherwampler.github.io/tetris)
 
 ## Quick Start
 
