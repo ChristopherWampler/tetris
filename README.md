@@ -4,6 +4,9 @@
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Node](https://img.shields.io/badge/node-20%2B-green.svg)
+![GitHub Pages](https://img.shields.io/badge/demo-live-success.svg)
+![PWA Ready](https://img.shields.io/badge/PWA-ready-blueviolet.svg)
+![Mobile Friendly](https://img.shields.io/badge/mobile-friendly-brightgreen.svg)
 
 ## 🎮 [**PLAY NOW**](https://christopherwampler.github.io/tetris) 🎮
 
@@ -13,7 +16,11 @@
 
 ## About
 
-A fully-featured Tetris game with a retro CRT aesthetic, inspired by "The Hitchhiker's Guide to the Galaxy." This is a learning project combining a standalone HTML5 game with a simple Node.js backend.
+**DON'T PANIC: The Tetris Edition** is a fully-featured Progressive Web App that brings classic Tetris gameplay to life with a nostalgic CRT terminal aesthetic, inspired by Douglas Adams' "The Hitchhiker's Guide to the Galaxy."
+
+This learning project showcases modern web development techniques—combining a standalone HTML5 Canvas game with mobile-first design, PWA capabilities, and a simple Node.js/Express backend. Play instantly in your browser, or install it as a native-like app on your iPhone or Android device.
+
+**Perfect for:** Tetris enthusiasts, retro gaming fans, and developers learning HTML5 Canvas, PWA development, or TypeScript.
 
 ### Features
 

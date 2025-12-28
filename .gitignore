@@ -23,6 +23,10 @@ Thumbs.db
 *.swp
 *.swo
 
+# AI Assistant files
+.claude/
+.cursor/
+
 # Testing
 coverage/
 

@@ -468,6 +468,56 @@
             80% { transform: translateX(3px); }
         }
 
+        /* Visual Feedback Effects (replaces haptic on iOS) */
+        .game-board.piece-locked {
+            animation: lockPulse 0.15s ease-out;
+        }
+
+        @keyframes lockPulse {
+            0% { 
+                box-shadow: 0 0 30px rgba(0, 255, 65, 0.8),
+                            inset 0 0 40px rgba(0, 255, 65, 0.3);
+            }
+            100% { 
+                box-shadow: 0 0 20px rgba(0, 255, 65, 0.4),
+                            inset 0 0 30px rgba(0, 255, 65, 0.1);
+            }
+        }
+
+        .game-board.piece-rotated {
+            animation: rotatePulse 0.12s ease-out;
+        }
+
+        @keyframes rotatePulse {
+            0% { 
+                box-shadow: 0 0 25px rgba(255, 176, 0, 0.6),
+                            inset 0 0 30px rgba(255, 176, 0, 0.2);
+            }
+            100% { 
+                box-shadow: 0 0 20px rgba(0, 255, 65, 0.4),
+                            inset 0 0 30px rgba(0, 255, 65, 0.1);
+            }
+        }
+
+        .game-board.hard-drop {
+            animation: dropFlash 0.2s ease-out;
+        }
+
+        @keyframes dropFlash {
+            0% { 
+                box-shadow: 0 0 40px rgba(255, 71, 87, 0.8),
+                            inset 0 0 50px rgba(255, 71, 87, 0.3);
+            }
+            50% {
+                box-shadow: 0 0 30px rgba(255, 71, 87, 0.5),
+                            inset 0 0 40px rgba(255, 71, 87, 0.2);
+            }
+            100% { 
+                box-shadow: 0 0 20px rgba(0, 255, 65, 0.4),
+                            inset 0 0 30px rgba(0, 255, 65, 0.1);
+            }
+        }
+
         /* Particle Container */
         .particle-container {
             position: absolute;
@@ -493,24 +543,99 @@
         /* Mobile Touch Controls (Hidden by default on desktop) */
         .touch-controls {
             display: none;
-            margin-top: 20px;
-            gap: 10px;
+            flex-direction: column;
+            gap: 8px;
+            width: 100%;
+            max-width: 360px;
+            margin: 0 auto;
+        }
+
+        .touch-row {
+            display: flex;
+            gap: 8px;
+            width: 100%;
         }
 
         .touch-btn {
             background: var(--panel-bg);
             border: 2px solid var(--electric-green);
             color: var(--electric-green);
-            padding: 15px 25px;
             font-size: 1.5rem;
+            font-family: inherit;
             cursor: pointer;
-            border-radius: 8px;
+            border-radius: 12px;
             touch-action: manipulation;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            transition: all 0.1s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
+        /* Enhanced button press feedback */
         .touch-btn:active {
+            transform: scale(0.92);
             background: var(--electric-green);
             color: var(--space-black);
+            box-shadow: 0 0 25px rgba(0, 255, 65, 0.7);
+        }
+
+        /* Movement buttons - larger for thumb ergonomics */
+        .touch-btn-move {
+            flex: 1;
+            min-height: 60px;
+            font-size: 1.8rem;
+        }
+
+        /* Soft drop button */
+        .touch-btn-soft {
+            flex: 1.2;
+            min-height: 60px;
+            font-size: 1.6rem;
+            border-color: var(--towel-green);
+            color: var(--towel-green);
+        }
+
+        .touch-btn-soft:active {
+            background: var(--towel-green);
+            box-shadow: 0 0 25px rgba(38, 222, 129, 0.7);
+        }
+
+        /* Rotate button - accent color */
+        .touch-btn-rotate {
+            flex: 1;
+            min-height: 50px;
+            font-size: 1.6rem;
+            border-color: var(--amber);
+            color: var(--amber);
+        }
+
+        .touch-btn-rotate:active {
+            background: var(--amber);
+            box-shadow: 0 0 25px rgba(255, 176, 0, 0.7);
+        }
+
+        /* Hard drop button - intense */
+        .touch-btn-drop {
+            flex: 1;
+            min-height: 50px;
+            font-size: 1.6rem;
+            border-color: var(--vogon-red);
+            color: var(--vogon-red);
+        }
+
+        .touch-btn-drop:active {
+            background: var(--vogon-red);
+            box-shadow: 0 0 25px rgba(255, 71, 87, 0.7);
+        }
+
+        /* Pause button - subdued */
+        .touch-btn-pause {
+            flex: 0.6;
+            min-height: 50px;
+            font-size: 1.2rem;
+            opacity: 0.8;
         }
 
         @media (max-width: 900px) {
@@ -581,31 +706,18 @@
 
             .touch-controls {
                 display: flex;
+                flex-direction: column;
                 gap: 8px;
                 width: 100%;
-                max-width: 500px;
-                padding-bottom: env(safe-area-inset-bottom, 10px);
+                max-width: 360px;
+                padding: 10px;
+                padding-bottom: max(10px, env(safe-area-inset-bottom));
             }
 
-            .touch-btn {
-                flex: 1;
-                min-width: 44px;
-                min-height: 44px;
-                padding: 12px 20px;
-                font-size: 1.3rem;
-                border-radius: 12px;
-                transition: all 0.1s ease;
-                user-select: none;
-                -webkit-tap-highlight-color: transparent;
-            }
-
-            .touch-btn:active {
-                transform: scale(0.95);
-                box-shadow: 0 0 20px rgba(0, 255, 65, 0.6);
-            }
-
-            .touch-btn-pause {
-                flex: 0.7;
+            .touch-row {
+                display: flex;
+                gap: 8px;
+                width: 100%;
             }
 
             .desktop-only {
@@ -653,12 +765,24 @@
 
             .touch-controls {
                 gap: 5px;
+                max-width: 320px;
             }
 
-            .touch-btn {
-                padding: 8px 12px;
-                font-size: 1.1rem;
+            .touch-row {
+                gap: 5px;
+            }
+
+            .touch-btn-move,
+            .touch-btn-soft {
+                min-height: 50px;
+                font-size: 1.4rem;
+            }
+
+            .touch-btn-rotate,
+            .touch-btn-drop,
+            .touch-btn-pause {
                 min-height: 40px;
+                font-size: 1.2rem;
             }
         }
 
@@ -744,11 +868,29 @@
                 left: 50%;
                 transform: translateX(-50%);
                 padding-bottom: max(5px, env(safe-area-inset-bottom));
-                max-width: 400px;
+                max-width: 340px;
+                flex-direction: row;
+                gap: 10px;
             }
 
-            .touch-btn {
-                padding: 6px 10px;
+            .touch-row {
+                flex-direction: column;
+                gap: 4px;
+            }
+
+            .touch-row-movement {
+                order: -1;
+            }
+
+            .touch-btn-move,
+            .touch-btn-soft {
+                min-height: 36px;
+                font-size: 1.2rem;
+            }
+
+            .touch-btn-rotate,
+            .touch-btn-drop,
+            .touch-btn-pause {
                 min-height: 32px;
                 font-size: 1rem;
             }
@@ -883,13 +1025,18 @@
             </div>
         </div>
 
-        <!-- Mobile Touch Controls -->
+        <!-- Mobile Touch Controls - Two Row Layout -->
         <div class="touch-controls">
-            <button class="touch-btn" id="btnLeft">←</button>
-            <button class="touch-btn" id="btnRotate">↻</button>
-            <button class="touch-btn" id="btnRight">→</button>
-            <button class="touch-btn" id="btnDrop">⬇</button>
-            <button class="touch-btn touch-btn-pause" id="btnPause">⏸</button>
+            <div class="touch-row touch-row-actions">
+                <button class="touch-btn touch-btn-rotate" id="btnRotate">↻</button>
+                <button class="touch-btn touch-btn-drop" id="btnDrop">⬇</button>
+                <button class="touch-btn touch-btn-pause" id="btnPause">⏸</button>
+            </div>
+            <div class="touch-row touch-row-movement">
+                <button class="touch-btn touch-btn-move" id="btnLeft">◀</button>
+                <button class="touch-btn touch-btn-soft" id="btnSoftDrop">▼</button>
+                <button class="touch-btn touch-btn-move" id="btnRight">▶</button>
+            </div>
         </div>
     </div>
 
@@ -1075,13 +1222,6 @@
         let hasAchievedFirstTetris = false;
         let milestoneFlags = {};
 
-        // Touch gesture tracking
-        let touchStartX = 0;
-        let touchStartY = 0;
-        let touchStartTime = 0;
-        let isSwiping = false;
-        const SWIPE_THRESHOLD = 30; // pixels
-
         // Touch button management
         let repeatIntervalId = null;
         let touchButtonActive = null;
@@ -1124,12 +1264,6 @@
             // Setup resize handlers for responsive design
             window.addEventListener('resize', handleResize);
             window.addEventListener('orientationchange', handleResize);
-
-            // Setup touch gesture handlers for mobile swipe controls
-            const gameBoard = document.getElementById('gameBoard');
-            gameBoard.addEventListener('touchstart', handleTouchStart, {passive: false});
-            gameBoard.addEventListener('touchmove', handleTouchMove, {passive: false});
-            gameBoard.addEventListener('touchend', handleTouchEnd, {passive: false});
 
             // Initialize audio context on first user interaction
             document.addEventListener('click', initAudio, { once: true });
@@ -1216,6 +1350,14 @@
             setupTouchButton('btnRotate', () => rotatePiece(), false);
             setupTouchButton('btnDrop', () => hardDrop(), false);
             setupTouchButton('btnPause', () => togglePause(), false);
+            
+            // Soft drop - moves piece down one row with hold-to-repeat
+            setupTouchButton('btnSoftDrop', () => {
+                if (movePiece(0, 1)) {
+                    score += 1; // Soft drop bonus
+                    updateScoreDisplay();
+                }
+            }, true);
         }
 
         function handleKeyDown(e) {
@@ -1364,7 +1506,6 @@
                 currentPiece.y = newY;
                 if (dx !== 0) {
                     playSound('move');
-                    triggerHaptic('light');
                 }
                 return true;
             }
@@ -1381,7 +1522,7 @@
                 currentPiece.rotation = nextRotation;
                 currentPiece.shape = nextShape;
                 playSound('rotate');
-                triggerHaptic('medium');
+                triggerVisualFeedback('rotate');
                 return;
             }
 
@@ -1393,7 +1534,7 @@
                     currentPiece.rotation = nextRotation;
                     currentPiece.shape = nextShape;
                     playSound('rotate');
-                    triggerHaptic('medium');
+                    triggerVisualFeedback('rotate');
                     return;
                 }
             }
@@ -1408,7 +1549,7 @@
             updateScoreDisplay();
             lockPiece();
             playSound('drop');
-            triggerHaptic('heavy');
+            triggerVisualFeedback('hardDrop');
         }
 
         function lockPiece() {
@@ -1427,6 +1568,9 @@
                     }
                 }
             }
+            
+            // Visual feedback for piece locking
+            triggerVisualFeedback('lock');
             
             // Check for line clears
             clearLines();
@@ -1451,7 +1595,6 @@
                 // Visual effects
                 triggerLineClearEffect(linesToClear);
                 createParticles(linesToClear);
-                triggerHaptic('success');
 
                 // Remove lines
                 for (const row of linesToClear) {
@@ -1572,7 +1715,6 @@
             document.getElementById('gameOverOverlay').classList.add('active');
 
             playSound('gameOver');
-            triggerHaptic('error');
         }
 
         // ===================
@@ -1734,6 +1876,35 @@
             document.getElementById('message').textContent = msg;
         }
 
+        // ===================
+        // VISUAL FEEDBACK SYSTEM
+        // ===================
+        
+        function triggerVisualFeedback(type) {
+            const gameBoard = document.getElementById('gameBoard');
+            
+            // Remove any existing feedback classes
+            gameBoard.classList.remove('piece-locked', 'piece-rotated', 'hard-drop');
+            
+            // Force reflow to restart animation
+            void gameBoard.offsetWidth;
+            
+            switch (type) {
+                case 'rotate':
+                    gameBoard.classList.add('piece-rotated');
+                    setTimeout(() => gameBoard.classList.remove('piece-rotated'), 120);
+                    break;
+                case 'lock':
+                    gameBoard.classList.add('piece-locked');
+                    setTimeout(() => gameBoard.classList.remove('piece-locked'), 150);
+                    break;
+                case 'hardDrop':
+                    gameBoard.classList.add('hard-drop');
+                    setTimeout(() => gameBoard.classList.remove('hard-drop'), 200);
+                    break;
+            }
+        }
+
         // Occasionally show random HHGG messages
         setInterval(() => {
             if (!gameOver && !paused && Math.random() < 0.1) {
@@ -1796,95 +1967,6 @@
                     gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 1);
                     oscillator.stop(audioCtx.currentTime + 1);
                     break;
-            }
-        }
-
-        // ===================
-        // TOUCH GESTURE HANDLERS
-        // ===================
-
-        function handleTouchStart(e) {
-            if (gameOver || paused) return;
-            e.preventDefault();
-            const touch = e.touches[0];
-            touchStartX = touch.clientX;
-            touchStartY = touch.clientY;
-            touchStartTime = Date.now();
-            isSwiping = true;
-        }
-
-        function handleTouchMove(e) {
-            if (!isSwiping || gameOver || paused) return;
-            e.preventDefault();
-        }
-
-        function handleTouchEnd(e) {
-            if (!isSwiping || gameOver || paused) return;
-            e.preventDefault();
-            isSwiping = false;
-
-            const touch = e.changedTouches[0];
-            const deltaX = touch.clientX - touchStartX;
-            const deltaY = touch.clientY - touchStartY;
-            const absX = Math.abs(deltaX);
-            const absY = Math.abs(deltaY);
-
-            if (absX < SWIPE_THRESHOLD && absY < SWIPE_THRESHOLD) return;
-
-            if (absX > absY) {
-                // Horizontal swipe
-                if (deltaX > 0) {
-                    movePiece(1, 0); // Swipe right
-                } else {
-                    movePiece(-1, 0); // Swipe left
-                }
-            } else {
-                // Vertical swipe
-                if (deltaY > 0) {
-                    hardDrop(); // Swipe down
-                } else {
-                    rotatePiece(); // Swipe up
-                }
-            }
-        }
-
-        // ===================
-        // HAPTIC FEEDBACK SYSTEM
-        // ===================
-
-        const supportsHaptics = 'vibrate' in navigator;
-        let hapticsEnabled = true;
-
-        // Respect user's reduced motion preference
-        if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
-            hapticsEnabled = false;
-        }
-
-        function triggerHaptic(type) {
-            if (!supportsHaptics || !hapticsEnabled) return;
-
-            try {
-                switch (type) {
-                    case 'light':
-                        navigator.vibrate(10);
-                        break;
-                    case 'medium':
-                        navigator.vibrate(20);
-                        break;
-                    case 'heavy':
-                        navigator.vibrate(40);
-                        break;
-                    case 'success':
-                        navigator.vibrate([30, 50, 50]);
-                        break;
-                    case 'error':
-                        navigator.vibrate([50, 100, 50, 100, 100]);
-                        break;
-                    default:
-                        navigator.vibrate(20);
-                }
-            } catch (e) {
-                console.log('Haptic failed:', e);
             }
         }
 

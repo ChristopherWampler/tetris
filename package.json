@@ -23,6 +23,10 @@
   ],
   "author": "Chris",
   "license": "MIT",
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=9.0.0"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/ChristopherWampler/tetris.git"

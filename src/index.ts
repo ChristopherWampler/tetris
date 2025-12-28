@@ -11,7 +11,7 @@ const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
 app.get("/", (req, res) => {
   res.json({
     message: "Hello from tetris!",
-    tip: "Open hitchhikers-tetris.html in your browser to play the game!"
+    tip: "Open index.html in your browser to play the game! Or visit https://christopherwampler.github.io/tetris"
   });
 });
 
