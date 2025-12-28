@@ -367,6 +367,37 @@
             animation: blink 1s infinite;
         }
 
+        .restart-btn {
+            background: var(--panel-bg);
+            border: 2px solid var(--electric-green);
+            color: var(--electric-green);
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            font-family: inherit;
+            cursor: pointer;
+            border-radius: 8px;
+            margin-top: 20px;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .restart-btn:hover,
+        .restart-btn:active {
+            background: var(--electric-green);
+            color: var(--space-black);
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.6);
+        }
+
+        /* Responsive visibility utilities */
+        .desktop-only {
+            display: block;
+        }
+
+        .mobile-only {
+            display: none;
+        }
+
         @keyframes blink {
             0%, 50% { opacity: 1; }
             51%, 100% { opacity: 0.3; }
@@ -484,41 +515,60 @@
 
         @media (max-width: 900px) {
             .main-title {
-                font-size: 1.8rem;
+                font-size: 1.6rem;
                 letter-spacing: 2px;
             }
 
             .subtitle {
-                font-size: 0.8rem;
+                font-size: 0.7rem;
+                margin-top: 4px;
+            }
+
+            .title-section {
+                margin-bottom: 10px;
             }
 
             .game-container {
-                padding: 10px;
-                padding-top: max(10px, env(safe-area-inset-top));
-                padding-bottom: max(10px, env(safe-area-inset-bottom));
+                padding: 8px;
+                padding-top: max(8px, env(safe-area-inset-top));
+                padding-bottom: max(8px, env(safe-area-inset-bottom));
+                justify-content: flex-start;
             }
 
             .game-layout {
                 flex-direction: column;
-                gap: 15px;
+                gap: 10px;
             }
 
             .guide-panel {
                 display: none;
             }
 
+            .game-board-container {
+                display: flex;
+                justify-content: center;
+            }
+
             .side-panel {
-                flex-direction: row;
-                flex-wrap: wrap;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
                 width: 100%;
                 gap: 8px;
+                order: 1;
             }
 
             .stat-box {
-                flex: 1 1 auto;
-                min-width: 90px;
-                max-width: 150px;
                 padding: 8px;
+            }
+
+            /* Make next piece preview and sound toggle span full width */
+            .next-piece-box {
+                grid-column: 1;
+            }
+
+            .sound-toggle {
+                grid-column: 2;
+                grid-row: 4;
             }
 
             .stat-label {
@@ -557,16 +607,56 @@
             .touch-btn-pause {
                 flex: 0.7;
             }
+
+            .desktop-only {
+                display: none;
+            }
+
+            .mobile-only {
+                display: block;
+            }
         }
 
         /* iPhone SE optimizations */
         @media (max-width: 375px) and (max-height: 667px) {
             .main-title {
-                font-size: 1.5rem;
+                font-size: 1.3rem;
+            }
+
+            .subtitle {
+                display: none;
+            }
+
+            .title-section {
+                margin-bottom: 6px;
+            }
+
+            .game-layout {
+                gap: 6px;
+            }
+
+            .side-panel {
+                gap: 4px;
+            }
+
+            .stat-box {
+                padding: 5px;
+            }
+
+            .stat-label {
+                font-size: 0.5rem;
+            }
+
+            .stat-value {
+                font-size: 1rem;
+            }
+
+            .touch-controls {
+                gap: 5px;
             }
 
             .touch-btn {
-                padding: 10px 15px;
+                padding: 8px 12px;
                 font-size: 1.1rem;
                 min-height: 40px;
             }
@@ -576,19 +666,95 @@
         @media (max-width: 900px) and (orientation: landscape) {
             .game-container {
                 padding: 5px;
+                padding-left: max(5px, env(safe-area-inset-left));
+                padding-right: max(5px, env(safe-area-inset-right));
+                justify-content: flex-start;
+                min-height: auto;
+            }
+
+            .title-section {
+                margin-bottom: 5px;
             }
 
             .main-title {
-                font-size: 1.3rem;
+                font-size: 1.1rem;
+                letter-spacing: 1px;
             }
 
             .subtitle {
                 display: none;
             }
 
+            .game-layout {
+                flex-direction: row;
+                align-items: flex-start;
+                gap: 10px;
+                width: 100%;
+                justify-content: center;
+            }
+
+            .game-board-container {
+                order: 1;
+                flex-shrink: 0;
+            }
+
+            .side-panel {
+                order: 2;
+                flex-direction: column;
+                width: 120px;
+                gap: 4px;
+                flex-wrap: nowrap;
+            }
+
+            .stat-box {
+                min-width: unset;
+                max-width: unset;
+                padding: 4px 6px;
+            }
+
+            .stat-label {
+                font-size: 0.5rem;
+            }
+
+            .stat-value {
+                font-size: 0.9rem;
+            }
+
+            .next-piece-box {
+                order: -1;
+            }
+
+            .next-piece-canvas {
+                margin-top: 4px;
+            }
+
+            .piece-name {
+                display: none;
+            }
+
+            /* Hide less important elements in landscape */
+            .message-box,
+            .sound-toggle {
+                display: none;
+            }
+
+            .touch-controls {
+                position: fixed;
+                bottom: 5px;
+                left: 50%;
+                transform: translateX(-50%);
+                padding-bottom: max(5px, env(safe-area-inset-bottom));
+                max-width: 400px;
+            }
+
             .touch-btn {
-                padding: 8px 12px;
-                min-height: 36px;
+                padding: 6px 10px;
+                min-height: 32px;
+                font-size: 1rem;
+            }
+
+            .touch-btn-pause {
+                flex: 0.5;
             }
         }
 
@@ -737,7 +903,8 @@
         <div class="dont-panic">DON'T PANIC</div>
         <div class="game-over-quote" id="gameOverQuote"></div>
         <div class="final-score" id="finalScore"></div>
-        <div class="restart-prompt">Press R or SPACE to travel through time and try again</div>
+        <div class="restart-prompt desktop-only">Press R or SPACE to travel through time and try again</div>
+        <button class="restart-btn mobile-only" id="btnRestart">↻ TRY AGAIN</button>
     </div>
 
     <script>
@@ -1035,6 +1202,13 @@
 
             // Sound toggle
             document.getElementById('soundToggle').addEventListener('click', toggleSound);
+
+            // Mobile restart button
+            document.getElementById('btnRestart').addEventListener('click', () => {
+                if (gameOver) {
+                    resetGame();
+                }
+            });
 
             // Enhanced touch controls with hold-to-repeat
             setupTouchButton('btnLeft', () => movePiece(-1, 0), true);
