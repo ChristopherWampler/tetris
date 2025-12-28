@@ -1,7 +1,35 @@
+# Dependencies
 node_modules/
+
+# Build output
 dist/
-*.log
-.DS_Store
-.env
 *.tsbuildinfo
+
+# Logs
+*.log
+logs/
+
+# Environment
+.env
+.env.local
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Testing
+coverage/
+
+# Temporary files
+*.tmp
+.cache/
+
+# MCP files (after moving screenshots)
+.playwright-mcp/
 

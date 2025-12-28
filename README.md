@@ -1,57 +1,152 @@
-# tetris
+# 🎮 DON'T PANIC: The Tetris Edition
 
-A Node.js Express application with Docker support.
+*A Hitchhiker's Guide to the Galaxy themed Tetris game*
 
-## Getting Started
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![Node](https://img.shields.io/badge/node-20%2B-green.svg)
 
-### Prerequisites
+![Tetris Gameplay](docs/screenshots/gameplay.png)
 
-- Node.js 20+
-- npm
-- Docker (optional, for containerized development)
+## About
 
-### Local Development
+A fully-featured Tetris game with a retro CRT aesthetic, inspired by "The Hitchhiker's Guide to the Galaxy." This is a learning project combining a standalone HTML5 game with a simple Node.js backend.
 
-1. Install dependencies:
+### Features
+
+- 🌌 Animated starfield background
+- 💚 CRT scanline effects and retro green terminal styling
+- 🎮 Full Tetris mechanics (rotation, scoring, progressive levels)
+- 📱 Mobile-responsive touch controls
+- 🔊 Sound effects toggle
+- 💾 Local high score persistence
+- ⌨️ Keyboard controls: Arrow keys, Space (hard drop), P (pause), R (restart)
+- 🎨 HHGG-themed piece names and messages
+
+## Screenshots
+
+### Main Gameplay
+![Gameplay](docs/screenshots/gameplay.png)
+*Classic Tetris gameplay with the Hitchhiker's Guide theme*
+
+### More Action
+![Gameplay in Action](docs/screenshots/gameplay-action.png)
+*Showing score progression and different colored pieces*
+
+## Quick Start
+
+### Play the Game (Easiest Way)
+
+Just open `hitchhikers-tetris.html` in your browser - no installation needed!
+
+### Run with Node.js Backend (Learning Project)
+
+1. **Install Node.js 20+**
+   Download from [nodejs.org](https://nodejs.org/)
+
+2. **Clone the repository**
+   ```bash
+   git clone https://github.com/ChristopherWampler/tetris.git
+   cd tetris
+   ```
+
+3. **Install dependencies**
    ```bash
    npm install
    ```
 
-2. Build the project:
+4. **Build and start the server**
    ```bash
    npm run build
-   ```
-
-3. Start the server:
-   ```bash
    npm start
    ```
 
-   The server will run on `http://localhost:3000` (or the port specified in `PORT` environment variable).
+5. **Visit** http://localhost:3000
+   The server provides a simple API endpoint. To play the game, open `hitchhikers-tetris.html` in your browser.
 
-4. For development with auto-rebuild:
-   ```bash
-   npm run dev
-   ```
+### Run with Docker
 
-### Docker Development
+```bash
+docker-compose up
+```
 
-1. Build and run with Docker Compose:
-   ```bash
-   docker-compose up
-   ```
+Then visit http://localhost:3000
 
-2. The server will be available at `http://localhost:3000`
+## Project Structure
 
-## Scripts
+```
+tetris/
+├── hitchhikers-tetris.html    # Standalone game (just open in browser!)
+├── src/
+│   └── index.ts               # Simple Express server (learning project)
+├── docs/
+│   └── screenshots/           # Game screenshots
+├── package.json               # Node.js dependencies
+├── Dockerfile                 # Docker configuration
+├── docker-compose.yml         # Docker orchestration
+└── README.md                  # You are here
+```
+
+## Development
+
+This is a learning project! The game is a standalone HTML file, and the Express backend is for learning Node.js basics.
+
+### Available Scripts
 
 - `npm run build` - Compile TypeScript to JavaScript
-- `npm run dev` - Watch mode for development
-- `npm start` - Run the compiled application
-- `npm run lint` - Run ESLint
+- `npm run dev` - Watch mode for development (auto-recompiles on changes)
+- `npm start` - Run the compiled server
+- `npm run lint` - Check code quality with ESLint
 - `npm run format` - Format code with Prettier
+
+### Development Conventions
+
+- **Language:** TypeScript for the backend, vanilla JavaScript for the game
+- **Linting:** ESLint with TypeScript support
+- **Formatting:** Prettier for consistent code style
+- **Editor Config:** Uses `.editorconfig` for consistent formatting across editors
+
+## Technologies Used
+
+**Game (Frontend):**
+- HTML5 Canvas for rendering
+- Vanilla JavaScript (no frameworks!)
+- CSS3 (animations, flexbox, CRT effects)
+- Web Audio API for sound effects
+- localStorage for high score persistence
+
+**Backend (Learning):**
+- Node.js 20
+- Express.js
+- TypeScript
+- Docker for containerization
+
+## Game Controls
+
+- **Arrow Left/Right** - Move piece horizontally
+- **Arrow Up** - Rotate piece
+- **Arrow Down** - Soft drop (faster descent)
+- **Spacebar** - Hard drop (instant placement)
+- **P** - Pause/Resume
+- **R** - Restart (after game over)
+
+**Mobile:** Touch controls appear at the bottom of the screen
+
+## Contributing
+
+This is a personal learning project, but feedback and suggestions are welcome! Feel free to open an issue if you find a bug or have an idea for improvement.
 
 ## License
 
-MIT © Chris 2025
+MIT © 2025 Chris
 
+See [LICENSE](LICENSE) for more information.
+
+## Acknowledgments
+
+- Inspired by "The Hitchhiker's Guide to the Galaxy" by Douglas Adams
+- Classic Tetris game mechanics
+- Built as a learning project to explore HTML5 Canvas, TypeScript, and Node.js
+
+---
+
+*"Don't Panic, and always know where your tetromino is."*

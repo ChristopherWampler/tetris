@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(test:*)",
+      "Bash(git -C \"C:\\\\Development\\\\02-projects\\\\tetris\" log --oneline -10)",
+      "Bash(git -C \"C:\\\\Development\\\\02-projects\\\\tetris\" show ca05705 --name-status)",
+      "Bash(git -C \"C:\\\\Development\\\\02-projects\\\\tetris\" config --list)",
+      "Bash(cat:*)",
+      "Bash(ls:*)",
+      "Bash(git add:*)"
+    ]
+  }
+}

@@ -1,7 +1,7 @@
 {
   "name": "tetris",
   "version": "0.1.0",
-  "description": "A Node.js Express application with Docker support",
+  "description": "A Hitchhiker's Guide to the Galaxy themed Tetris game with Node.js backend",
   "type": "module",
   "main": "dist/index.js",
   "scripts": {
@@ -11,9 +11,25 @@
     "lint": "eslint src --ext .ts",
     "format": "prettier --write \"src/**/*.ts\""
   },
-  "keywords": [],
+  "keywords": [
+    "tetris",
+    "game",
+    "hitchhikers-guide",
+    "canvas",
+    "express",
+    "typescript",
+    "learning-project"
+  ],
   "author": "Chris",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ChristopherWampler/tetris.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ChristopherWampler/tetris/issues"
+  },
+  "homepage": "https://github.com/ChristopherWampler/tetris#readme",
   "dependencies": {
     "express": "^4.18.2"
   },
